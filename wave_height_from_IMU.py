@@ -29,13 +29,13 @@ PORT = '/dev/ttyACM0'
 BAUDRATE = 9600
 
 
-def skew(v):
+def skew(u):
     """
     Returns the skew symmetric matrix of a vector
     """
-    return np.array([[0,   -v[2],  v[1]],
-                     [v[2],   0,  -v[0]],
-                     [-v[1], v[0],  0]])
+    return np.array([[0,   -u[2],  u[1]],
+                     [u[2],   0,  -u[0]],
+                     [-u[1], u[0],  0]])
 
 
 def vector_angle(v1, v2):
