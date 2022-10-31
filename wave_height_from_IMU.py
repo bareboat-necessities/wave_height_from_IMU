@@ -81,28 +81,28 @@ def predict_state(gyro_prev_p, z_p, T_p):
     return (np.identity(3) - T_p * skew(gyro_prev_p)).dot(z_p)
 
 
-def predict_error_covariance(gyro_prev_p, z_prev_p, T_p, P, sigma_gyro):
+def predict_error_covariance(gyro_prev_p, z_prev_p, T_p, P_p, sigma_gyro_p):
     """
     Predict the covariance matrix from the data we have
     """
-    Q = get_prediction_covariance(z_prev_p, T_p, sigma_gyro) # Prediction covariance matrix
-    return (np.identity(3) - T_p*skew(gyro_prev_p)).dot(P).dot((np.identity(3) - T_p*skew(gyro_prev_p)).T_p) + Q
+    Q = get_prediction_covariance(z_prev_p, T_p, sigma_gyro_p) # Prediction covariance matrix
+    return (np.identity(3) - T_p*skew(gyro_prev_p)).dot(P_p).dot((np.identity(3) - T_p*skew(gyro_prev_p)).T_p) + Q
 
 
-def update_kalman_gain(P, H, ca, a_sensor_prev, sigma_accel):
+def update_kalman_gain(P_p, H_p, ca_p, a_sensor_prev, sigma_accel_p):
     """
     Compute the gain from the predicted error covariance matrix
     and the measurement covariance matrix
     """
-    R = get_measurement_covariance(ca, a_sensor_prev, sigma_accel)
-    return P.dot(H.T).dot(la.inv(H.dot(P).dot(H.T) + R))
+    R = get_measurement_covariance(ca_p, a_sensor_prev, sigma_accel_p)
+    return P_p.dot(H_p.T_p).dot(la.inv(H_p.dot(P_p).dot(H_p.T_p) + R))
 
 
-def update_state_with_measurement(predicted_state, K, measurement, H):
+def update_state_with_measurement(predicted_state, K_p, measurement_p, H_p):
     """
     Update the state estimate with the measurement
     """
-    return predicted_state + K.dot(measurement - H.dot(predicted_state))
+    return predicted_state + K_p.dot(measurement_p - H_p.dot(predicted_state))
 
 
 def update_error_covariance(P_p, H_p, K_p):
@@ -111,8 +111,9 @@ def update_error_covariance(P_p, H_p, K_p):
     """
     return (np.identity(3) - K_p.dot(H_p)).dot(P_p)
 
+
 # TODO: fix ZUPT, use height instead of velocity
-def ZUPT(a_earth, vertical_vel, zupt_history, zupt_counter):
+def ZUPT(a_earth_p, vertical_vel_p, zupt_hist, zupt_count):
     """
     Apply zero-velocity update to limit drift error. When the
     zero speed is detected then the speed is set to zero in
@@ -121,13 +122,13 @@ def ZUPT(a_earth, vertical_vel, zupt_history, zupt_counter):
     the estimated acceleration is lower than the threshold
     """
     THRESHOLD = 0.3
-    if len(zupt_history) > zupt_counter % 12:
-        del zupt_history[zupt_counter % 12]
-    zupt_history.insert(zupt_counter % 12, a_earth)
+    if len(zupt_hist) > zupt_count % 12:
+        del zupt_hist[zupt_count % 12]
+    zupt_hist.insert(zupt_count % 12, a_earth_p)
 
-    if sum([la.norm(val) > THRESHOLD for val in zupt_history]) == 0:
-        return 0, zupt_history, zupt_counter
-    return vertical_vel, zupt_history, zupt_counter
+    if sum([la.norm(val) > THRESHOLD for val in zupt_hist]) == 0:
+        return 0, zupt_hist, zupt_count
+    return vertical_vel_p, zupt_hist, zupt_count
 
 
 def interpolate(curr_x, x_init, x_end, y_init, y_end):
@@ -193,7 +194,7 @@ while True:
 
         # Kalman filter for vertical acceleration estimation
 
-        # Prediction update with data from previous iteration and sensorss
+        # Prediction update with data from previous iteration and sensors
         z = predict_state(i_gyro_prev, z_prev, DESIRED_SAMPLING) # State prediction
         z /= la.norm(z)
         P = predict_error_covariance(i_gyro_prev, z_prev, DESIRED_SAMPLING, P, sigma_gyro)
