@@ -38,10 +38,10 @@ R = [[PosIntegral_Variance,               0],
      [                   0,   AccX_Variance]]
 
 # initial_state_mean
-X0 = [0,
-      0,
-      0,
-      AccX_Value[0, 0]]
+X0 = [0,                  # height integral
+      0,                  # height
+      0,                  # velocity
+      AccX_Value[0, 0]]   # acc
 
 # initial_state_covariance
 P0 = [[PosIntegral_Variance, 0,    0,               0],
