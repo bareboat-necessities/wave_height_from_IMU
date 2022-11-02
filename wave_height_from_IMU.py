@@ -1,239 +1,104 @@
-# Based on: https://github.com/juangallostra/AltitudeEstimation/tree/master/extras
-#
-# Vertical acceleration
-# estimation from IMU readings via a Kalman filter
-#
-# Initial author: Juan Gallostra
-# Date: 16-05-2018
-
-import serial
-import time
+from pykalman import KalmanFilter
 import numpy as np
-import numpy.linalg as la
+import matplotlib.pyplot as plt
 
-# desired sampling period
-DESIRED_SAMPLING = 0.02
+load_data()
 
-# standard deviation of sensors - educated guess
-sigma_accel = 0.2
-sigma_gyro = 0.2
+# Data description
+#  Time
+#  AccX_HP - high precision acceleration signal
+#  AccX_LP - low precision acceleration signal
+#  RefPosX - real position (ground truth)
+#  RefVelX - real velocity (ground truth)
 
-# gravity in m/s^2 
-g = 9.81
+# switch between two acceleration signals
+use_HP_signal = 1
 
-# more guesses - it has to be less that one for sure (I think)
-ca = 0.5
-
-# Serial parameters
-PORT = '/dev/ttyACM0'
-BAUDRATE = 9600
-
-
-def skew(u):
-    """
-    Returns the skew symmetric matrix of a vector
-    """
-    return np.array([[0,   -u[2],  u[1]],
-                     [u[2],   0,  -u[0]],
-                     [-u[1], u[0],  0]])
+if use_HP_signal:
+    AccX_Value = AccX_HP
+    AccX_Variance = 0.0007
+else:
+    AccX_Value = AccX_LP
+    AccX_Variance = 0.0020
 
 
-def vector_angle(v1, v2):
-    """ 
-    Returns the angle in degrees between vectors 'v1' and 'v2'    
-    """
-    return np.arccos(np.dot(v1, v2) / (la.norm(v1) * la.norm(v2)))*180 / np.pi
+# time step
+dt = 0.01
+
+# transition_matrix  
+F = [[1, dt, 0.5*dt**2],
+     [0,  1,       dt],
+     [0,  0,        1]]
+
+# observation_matrix   
+H = [0, 0, 1]
+
+# transition_covariance 
+Q = [[0.2,    0,      0],
+     [  0,  0.1,      0],
+     [  0,    0,  10e-4]]
+
+# observation_covariance 
+R = AccX_Variance
+
+# initial_state_mean
+X0 = [0,
+      0,
+      AccX_Value[0, 0]]
+
+# initial_state_covariance
+P0 = [[0,    0,               0],
+      [0,    0,               0],
+      [0,    0,   AccX_Variance]]
+
+n_timesteps = AccX_Value.shape[0]
+n_dim_state = 3
+filtered_state_means = np.zeros((n_timesteps, n_dim_state))
+filtered_state_covariances = np.zeros((n_timesteps, n_dim_state, n_dim_state))
+
+kf = KalmanFilter(transition_matrices = F,
+                  observation_matrices = H,
+                  transition_covariance = Q,
+                  observation_covariance = R,
+                  initial_state_mean = X0,
+                  initial_state_covariance = P0)
+
+# iterative estimation for each new measurement
+for t in range(n_timesteps):
+    if t == 0:
+        filtered_state_means[t] = X0
+        filtered_state_covariances[t] = P0
+    else:
+        filtered_state_means[t], filtered_state_covariances[t] = (
+            kf.filter_update(
+                filtered_state_means[t-1],
+                filtered_state_covariances[t-1],
+                AccX_Value[t, 0]
+            )
+        )
 
 
-def get_sensor_data(serial_obj):
-    """
-    Get accel, gyro data from serial
-    """
-    raw_data = serial_obj.readline().rstrip().split(",")
-    data = map(float, raw_data)
-    # split into gyro and accel readings
-    accel_0 = np.array(data[:3])*g
-    # account for gyro bias
-    gyro_0 = np.array(data[3:6])
-    return accel_0, gyro_0
+f, axarr = plt.subplots(3, sharex=True)
 
+axarr[0].plot(Time, AccX_Value, label="Input AccX")
+axarr[0].plot(Time, filtered_state_means[:, 2], "r-", label="Estimated AccX")
+axarr[0].set_title('Acceleration X')
+axarr[0].grid()
+axarr[0].legend()
+axarr[0].set_ylim([-4, 4])
 
-def get_prediction_covariance(state_prev, t, sigma_gyro_p):
-    """
-    Get the prediction covariance matrix
-    """
-    sigma = np.power(sigma_gyro_p, 2)*np.identity(3)
-    return -np.power(t, 2)*skew(state_prev).dot(sigma).dot(skew(state_prev))
+axarr[1].plot(Time, RefVelX, label="Reference VelX")
+axarr[1].plot(Time, filtered_state_means[:, 1], "r-", label="Estimated VelX")
+axarr[1].set_title('Velocity X')
+axarr[1].grid()
+axarr[1].legend()
+axarr[1].set_ylim([-1, 20])
 
+axarr[2].plot(Time, RefPosX, label="Reference PosX")
+axarr[2].plot(Time, filtered_state_means[:, 0], "r-", label="Estimated PosX")
+axarr[2].set_title('Position X')
+axarr[2].grid()
+axarr[2].legend()
+axarr[2].set_ylim([-10, 1000])
 
-def get_measurement_covariance(ca_p, a_sensor_prev, sigma_accel_p):
-    """
-    Get the measurement covariance matrix
-    """
-    sigma = np.power(sigma_accel_p, 2)*np.identity(3)
-    return sigma + (1.0/3)*np.power(ca_p, 2)*la.norm(a_sensor_prev)*np.identity(3)
-
-
-def predict_state(gyro_prev_p, z_p, T_p):
-    """
-    Predict the state evolution of the system one step ahead
-    """
-    return (np.identity(3) - T_p * skew(gyro_prev_p)).dot(z_p)
-
-
-def predict_error_covariance(gyro_prev_p, z_prev_p, T_p, P_p, sigma_gyro_p):
-    """
-    Predict the covariance matrix from the data we have
-    """
-    Q = get_prediction_covariance(z_prev_p, T_p, sigma_gyro_p) # Prediction covariance matrix
-    return (np.identity(3) - T_p*skew(gyro_prev_p)).dot(P_p).dot((np.identity(3) - T_p*skew(gyro_prev_p)).T_p) + Q
-
-
-def update_kalman_gain(P_p, H_p, ca_p, a_sensor_prev, sigma_accel_p):
-    """
-    Compute the gain from the predicted error covariance matrix
-    and the measurement covariance matrix
-    """
-    R = get_measurement_covariance(ca_p, a_sensor_prev, sigma_accel_p)
-    return P_p.dot(H_p.T_p).dot(la.inv(H_p.dot(P_p).dot(H_p.T_p) + R))
-
-
-def update_state_with_measurement(predicted_state, K_p, measurement_p, H_p):
-    """
-    Update the state estimate with the measurement
-    """
-    return predicted_state + K_p.dot(measurement_p - H_p.dot(predicted_state))
-
-
-def update_error_covariance(P_p, H_p, K_p):
-    """
-    Update the error covariance with the calculated gain
-    """
-    return (np.identity(3) - K_p.dot(H_p)).dot(P_p)
-
-
-# TODO: fix ZUPT, use height instead of velocity
-def ZUPT(a_earth_p, vertical_vel_p, zupt_hist, zupt_count):
-    """
-    Apply zero-velocity update to limit drift error. When the
-    zero speed is detected then the speed is set to zero in
-    preference to the complementary filter integral.
-    The zero speed is detected when during the last 12 readings
-    the estimated acceleration is lower than the threshold
-    """
-    THRESHOLD = 0.3
-    if len(zupt_hist) > zupt_count % 12:
-        del zupt_hist[zupt_count % 12]
-    zupt_hist.insert(zupt_count % 12, a_earth_p)
-
-    if sum([la.norm(val) > THRESHOLD for val in zupt_hist]) == 0:
-        return 0, zupt_hist, zupt_count
-    return vertical_vel_p, zupt_hist, zupt_count
-
-
-def interpolate(curr_x, x_init, x_end, y_init, y_end):
-    """
-    Compute an intermediate value between two points by
-    linear interpolation
-    """
-    m = (y_end - y_init)/(x_end - x_init)
-    n = y_end - x_end * m
-    return m * curr_x + n
-
-
-def interpolate_array(current_t, t_init, t_end, vector_init, vector_end):
-    """
-    Compute an intermediate vector between two vectors by linear interpolation
-    of each of its components
-    """
-    return [interpolate(current_t, t_init, t_end, values[0], values[1]) for values in zip(vector_init, vector_end)]
-
-
-# Serial communication object
-serial_com = serial.Serial(PORT, BAUDRATE)
-
-# Initialise needed variables
-prev_time = time.time()
-ZUPT_counter = 0
-z = np.array([0, 0, 1]) # assume earth and body frame have same orientation
-a_sensor = np.zeros(3) # the components of the acceleration are all 0
-gyro_prev = np.zeros(3)
-P = np.array([[100, 0, 0],[0, 100, 0],[0, 0, 100]]) # initial error covariance matrix
-H = g*np.identity(3) # observation transition matrix
-v = 0 # vertical velocity
-
-# for complementary filter
-zupt_history = []
-zupt_counter = 0
-a_earth_prev = 0
-
-# for kalman filter
-z_prev = z
-
-# for interpolation
-i_gyro_prev = np.zeros(3)
-
-
-# This is where the magic happens,
-# so pay close attention
-while True:
-
-    # get new sensor data
-    accel, gyro = get_sensor_data(serial_com)
-
-    # Calculate sampling period
-    curr_time = time.time()
-    T = curr_time - prev_time
-
-    # oversample via linear interpolation
-    for delta_t in np.linspace(DESIRED_SAMPLING, T, T/DESIRED_SAMPLING):
-
-        # interpolate values
-        i_accel = np.array(interpolate_array(delta_t, 0, T, accel_prev, accel))
-        i_gyro = np.array(interpolate_array(delta_t, 0, T, gyro_prev, gyro))
-
-        # Kalman filter for vertical acceleration estimation
-
-        # Prediction update with data from previous iteration and sensors
-        z = predict_state(i_gyro_prev, z_prev, DESIRED_SAMPLING) # State prediction
-        z /= la.norm(z)
-        P = predict_error_covariance(i_gyro_prev, z_prev, DESIRED_SAMPLING, P, sigma_gyro)
-        # Measurement update
-        K = update_kalman_gain(P, H, ca, a_sensor, sigma_accel)
-        measurement = accel - ca*a_sensor
-        z = update_state_with_measurement(z, K, measurement, H)
-        z /= la.norm(z)
-        P = update_error_covariance(P, H, K)
-
-        # compute the acceleration from the estimated value of z
-        a_sensor = i_accel - g*z
-        # Acceleration in earth reference frame
-        a_earth = np.vdot(a_sensor, z)
-
-        # Complementary filter for altitude and vertical velocity estimation
-        state = np.array([h, v])
-        if a_earth_prev:
-            state = np.array([[1, DESIRED_SAMPLING],[0, 1]]).dot(state) + \
-                    np.array([DESIRED_SAMPLING/2, 1])*DESIRED_SAMPLING*a_earth_prev
-        h, v = state
-
-        # ZUPT
-        v, zupt_history, zupt_counter = ZUPT(a_earth, v, zupt_history, zupt_counter)
-        zupt_counter += 1
-
-        # to see what's going on
-        print a_earth, v, h
-
-        # complementary filter estimates from values of previous measurements
-        a_earth_prev = a_earth
-        # for next kalman iteration
-        i_gyro_prev = i_gyro
-        z_prev = z
-
-    # for next interpolation
-    gyro_prev = gyro
-    accel_prev = accel
-    # Update time of last measurement
-    prev_time = curr_time
-
-serial_com.close()
+plt.show()
