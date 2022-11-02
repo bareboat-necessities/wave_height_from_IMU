@@ -6,20 +6,12 @@ load_data()
 
 # Data description
 #  Time
-#  AccX_HP - high precision acceleration signal
-#  AccX_LP - low precision acceleration signal
+#  AccX - acceleration signal
 #  RefPosX - real position (ground truth)
 #  RefVelX - real velocity (ground truth)
 
-# switch between two acceleration signals
-use_HP_signal = 1
-
-if use_HP_signal:
-    AccX_Value = AccX_HP
-    AccX_Variance = 0.0007
-else:
-    AccX_Value = AccX_LP
-    AccX_Variance = 0.0020
+AccX_Value = AccX
+AccX_Variance = 0.0007
 
 
 # time step
