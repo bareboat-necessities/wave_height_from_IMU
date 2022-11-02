@@ -3,12 +3,7 @@ Calculate sea wave height from IMU
 
 Algorithm description
 
-- Project acceleration to Earth center to get vertical acceleration
-- Use Kalman filter to adjust vertical acceleration
-- Calculate integral for vertical velocity and second integral for height
-- Adjust interpolation to zero height when acceleration is low
-- Capture min and max height over periods of time and report difference as wave height
-
+https://www.researchgate.net/profile/Mehdi-Hendijanizadeh/publication/264713649_A_Novel_Kalman_Filter_Based_Technique_for_Calculating_the_Time_History_of_Vertical_Displacement_of_a_Boat_from_Measured_Acceleration/links/53ec88db0cf24f241f1584c5/A-Novel-Kalman-Filter-Based-Technique-for-Calculating-the-Time-History-of-Vertical-Displacement-of-a-Boat-from-Measured-Acceleration.pdf
 
 TODO: 
 - generate NMEA 0183 sentence for wave height
