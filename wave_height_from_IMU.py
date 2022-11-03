@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 
 Data = np.loadtxt(fname="test-data.txt", delimiter=",", skiprows=0)
 
-print(Data)
-
 # Data description
 #  Time
 #  AccX - acceleration signal
@@ -63,29 +61,29 @@ n_dim_obs = 2
 filtered_state_means = np.zeros((n_timesteps, n_dim_state))
 filtered_state_covariances = np.zeros((n_timesteps, n_dim_state, n_dim_state))
 
-# kf = KalmanFilter(transition_matrices = F,
-#                   observation_matrices = H,
-#                   transition_covariance = Q,
-#                   observation_covariance = R,
-#                   initial_state_mean = X0,
-#                   initial_state_covariance = P0,
-#                   n_dim_obs = 2)
-#
-# # iterative estimation for each new measurement
-# for t in range(n_timesteps):
-#     if t == 0:
-#         filtered_state_means[t] = X0
-#         filtered_state_covariances[t] = P0
-#     else:
-#         observation = [0,
-#                        AccX_Value[t, 0]]
-#         filtered_state_means[t], filtered_state_covariances[t] = (
-#             kf.filter_update(
-#                 filtered_state_mean = filtered_state_means[t-1],
-#                 filtered_state_covariance = filtered_state_covariances[t-1],
-#                 observation = observation
-#             )
-#         )
+kf = KalmanFilter(transition_matrices = F,
+                  observation_matrices = H,
+                  transition_covariance = Q,
+                  observation_covariance = R,
+                  initial_state_mean = X0,
+                  initial_state_covariance = P0,
+                  n_dim_obs = 2)
+
+# iterative estimation for each new measurement
+for t in range(n_timesteps):
+    if t == 0:
+        filtered_state_means[t] = X0
+        filtered_state_covariances[t] = P0
+    else:
+        observation = [0,
+                       AccX_Value[t, 0]]
+        filtered_state_means[t], filtered_state_covariances[t] = (
+            kf.filter_update(
+                filtered_state_mean = filtered_state_means[t-1],
+                filtered_state_covariance = filtered_state_covariances[t-1],
+                observation = observation
+            )
+        )
 
 
 f, axarr = plt.subplots(3, sharex=True)
