@@ -25,38 +25,38 @@ PosIntegral_Variance = 1 # TODO: ???
 dt = 0.01
 
 # transition_matrix  
-F = [[1, dt, 0.5*dt**2, (1.0/6)*dt**3],
-     [0,  1,        dt,     0.5*dt**2],
-     [0,  0,         1,            dt],
-     [0,  0,         0,             1]]
+F = [[1, dt, 0.5*dt**2],
+     [0,  1,       dt],
+     [0,  0,        1]]
 
-# observation_matrix   
-H = [1, 0, 0, 1]
 
-# transition_covariance 
-Q = [[1,     0,    0,      0],
-     [0,   0.2,    0,      0],
-     [0,     0,  0.1,      0],
-     [0,     0,    0,  10e-4]]
+B = [ (1.0/6)*dt**3,
+          0.5*dt**2,
+                 dt]
 
-# observation_covariance 
-R = AccX_Variance
+# observation_matrix
+H = [1, 0, 0]
+
+# transition_covariance
+Q = [[1,     0,    0],
+     [0,   0.2,    0],
+     [0,     0,  0.1]]
+
+# observation_covariance
+R = [[PosIntegral_Variance]]
 
 # initial_state_mean
 X0 = [0,                  # height integral
       0,                  # height
-      0,                  # velocity
-      AccX_Value[0, 0]]   # acc
+      0]                  # velocity
 
 # initial_state_covariance
-P0 = [[PosIntegral_Variance, 0,    0,               0],
-      [0,                    0,    0,               0],
-      [0,                    0,    0,               0],
-      [0,                    0,    0,   AccX_Variance]]
+P0 = [[PosIntegral_Variance, 0,    0],
+      [0,                    0,    0],
+      [0,                    0,    0]]
 
 n_timesteps = AccX_Value.shape[0]
-n_dim_state = 4
-n_dim_obs = 2
+n_dim_state = 3
 filtered_state_means = np.zeros((n_timesteps, n_dim_state))
 filtered_state_covariances = np.zeros((n_timesteps, n_dim_state, n_dim_state))
 
@@ -73,14 +73,13 @@ for t in range(n_timesteps):
         filtered_state_means[t] = X0
         filtered_state_covariances[t] = P0
     else:
-        observation = [0,
-                       0,
-                       0,
-                       AccX_Value[t, 0]]
+        observation = 0
+        transition_offset = B * AccX_Value[t]
         filtered_state_means[t], filtered_state_covariances[t] = (
             kf.filter_update(
                 filtered_state_mean = filtered_state_means[t-1],
                 filtered_state_covariance = filtered_state_covariances[t-1],
+                transition_offset = transition_offset,
                 observation = observation
             )
         )
@@ -89,7 +88,7 @@ for t in range(n_timesteps):
 f, axarr = plt.subplots(3, sharex=True)
 
 axarr[0].plot(Time, AccX_Value, label="Input AccX")
-axarr[0].plot(Time, filtered_state_means[:, 3], "r-", label="Estimated AccX")
+#xarr[0].plot(Time, filtered_state_means[:, 2], "r-", label="Estimated AccX")
 axarr[0].set_title('Acceleration X')
 axarr[0].grid()
 axarr[0].legend()
@@ -100,7 +99,7 @@ axarr[1].plot(Time, filtered_state_means[:, 2], "r-", label="Estimated VelX")
 axarr[1].set_title('Velocity X')
 axarr[1].grid()
 axarr[1].legend()
-axarr[1].set_ylim([-0.4, 0.4])
+axarr[1].set_ylim([-0.6, 0.4])
 
 axarr[2].plot(Time, RefPosX, label="Reference PosX")
 axarr[2].plot(Time, filtered_state_means[:, 1], "r-", label="Estimated PosX")
