@@ -40,8 +40,7 @@ Q = [[1,     0,    0,      0],
      [0,     0,    0,  10e-4]]
 
 # observation_covariance 
-R = [[PosIntegral_Variance,               0],
-     [                   0,   AccX_Variance]]
+R = AccX_Variance
 
 # initial_state_mean
 X0 = [0,                  # height integral
@@ -66,8 +65,7 @@ kf = KalmanFilter(transition_matrices = F,
                   transition_covariance = Q,
                   observation_covariance = R,
                   initial_state_mean = X0,
-                  initial_state_covariance = P0,
-                  n_dim_obs = 2)
+                  initial_state_covariance = P0)
 
 # iterative estimation for each new measurement
 for t in range(n_timesteps):
@@ -76,6 +74,8 @@ for t in range(n_timesteps):
         filtered_state_covariances[t] = P0
     else:
         observation = [0,
+                       0,
+                       0,
                        AccX_Value[t, 0]]
         filtered_state_means[t], filtered_state_covariances[t] = (
             kf.filter_update(
