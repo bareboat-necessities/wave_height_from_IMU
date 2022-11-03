@@ -1,14 +1,22 @@
 from pykalman import KalmanFilter
+from scipy import linalg
 import numpy as np
 import matplotlib.pyplot as plt
 
-load_data()
+Data = np.loadtxt(fname="test-data.txt", delimiter=",", skiprows=0)
+
+print(Data)
 
 # Data description
 #  Time
 #  AccX - acceleration signal
 #  RefPosX - real position (ground truth)
 #  RefVelX - real velocity (ground truth)
+
+Time = Data[:, [0]]
+AccX = Data[:, [1]]
+RefPosX = Data[:, [2]]
+RefVelX = Data[:, [3]]
 
 AccX_Value = AccX
 AccX_Variance = 0.0007
@@ -60,7 +68,8 @@ kf = KalmanFilter(transition_matrices = F,
                   transition_covariance = Q,
                   observation_covariance = R,
                   initial_state_mean = X0,
-                  initial_state_covariance = P0)
+                  initial_state_covariance = P0,
+                  n_dim_obs = 2)
 
 # iterative estimation for each new measurement
 for t in range(n_timesteps):
