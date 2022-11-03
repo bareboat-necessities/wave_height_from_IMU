@@ -22,7 +22,7 @@ PosIntegral_Variance = 1 # TODO: ???
 
 
 # time step
-dt = 0.01
+dt = Data[1,0] - Data[0,0]
 
 # transition_matrix  
 F = [[1, dt, 0.5*dt**2],
