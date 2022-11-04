@@ -57,6 +57,7 @@ R = [[PosIntegral_Variance]]
 X0 = [0,   # height integral
       0,   # height
       0]   # velocity (if height is 0, it makes sense to set it to max(AccX_Value)/(2*pi*wave_freq) (under assumption wave is harmonic)
+           # the sign (+-) of initial velocity needs to be figured out then too
 
 # initial_state_covariance
 P0 = [[PosIntegral_Variance, 0,    0],
