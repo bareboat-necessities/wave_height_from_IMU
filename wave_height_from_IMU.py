@@ -54,9 +54,9 @@ Q = [[PosIntegral_Trans_Variance,     0,    0],
 R = [[PosIntegral_Variance]]
 
 # initial_state_mean
-X0 = [0,                  # height integral
-      0,                  # height
-      0]                  # velocity
+X0 = [0,   # height integral
+      0,   # height
+      0]   # velocity (if height is 0, it makes sense to set it to max(AccX_Value)/(2*pi*wave_freq) (under assumption wave is harmonic)
 
 # initial_state_covariance
 P0 = [[PosIntegral_Variance, 0,    0],
