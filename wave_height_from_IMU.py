@@ -82,7 +82,7 @@ for t in range(n_timesteps):
         filtered_state_covariances[t] = P0
     else:
         observation = 0
-        transition_offset = B * AccX_Value[t]
+        transition_offset = B * AccX_Value[t] # It's better to do B * (AccX_Value[t] - np.mean(AccX_Value))
         filtered_state_means[t], filtered_state_covariances[t] = (
             kf.filter_update(
                 filtered_state_mean = filtered_state_means[t-1],
