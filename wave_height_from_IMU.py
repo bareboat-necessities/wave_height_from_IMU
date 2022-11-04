@@ -3,6 +3,14 @@ from scipy import linalg
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Note: test-data.txt has acceleration offset -0.08 in signal
+# So acceleration mean is not 0, to illustrate how algorithm behaves in those conditions.
+
+# If you get rid of that offset
+# transition_offset = B * (AccX_Value[t] + 0.08)
+# and set PosIntegral_Trans_Variance to higher value you will see it converges much better.
+
+
 Data = np.loadtxt(fname="test-data.txt", delimiter=",", skiprows=0)
 
 # Data description
@@ -18,8 +26,8 @@ RefVelX = Data[:, [3]]
 
 AccX_Value = AccX
 AccX_Variance = 0.0007
-PosIntegral_Variance = 1 # TODO: ???
-
+PosIntegral_Variance = 1        # TODO: ???
+PosIntegral_Trans_Variance = 1  # TODO: ???
 
 # time step
 dt = Data[1,0] - Data[0,0]
@@ -29,7 +37,7 @@ F = [[1, dt, 0.5*dt**2],
      [0,  1,       dt],
      [0,  0,        1]]
 
-
+# for transition offset
 B = [ (1.0/6)*dt**3,
           0.5*dt**2,
                  dt]
@@ -38,9 +46,9 @@ B = [ (1.0/6)*dt**3,
 H = [1, 0, 0]
 
 # transition_covariance
-Q = [[1,     0,    0],
-     [0,   0.2,    0],
-     [0,     0,  0.1]]
+Q = [[PosIntegral_Trans_Variance,     0,    0],
+     [                         0,   0.2,    0],
+     [                         0,     0,  0.1]]
 
 # observation_covariance
 R = [[PosIntegral_Variance]]
