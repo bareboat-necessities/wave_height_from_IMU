@@ -26,8 +26,8 @@ RefVelX = Data[:, [3]]
 
 AccX_Value = AccX
 AccX_Variance = 0.0007
-PosIntegral_Variance = 1        # TODO: ???
-PosIntegral_Trans_Variance = 1  # TODO: ???
+PosIntegral_Variance = 100        # TODO: ???
+PosIntegral_Trans_Variance = 100  # TODO: ???
 
 # time step
 dt = Data[1,0] - Data[0,0]
@@ -63,6 +63,9 @@ P0 = [[PosIntegral_Variance, 0,    0],
       [0,                    0,    0],
       [0,                    0,    0]]
 
+# Evaluate signal offset from 0
+Acc_Mean = np.mean(AccX_Value)
+
 n_timesteps = AccX_Value.shape[0]
 n_dim_state = 3
 filtered_state_means = np.zeros((n_timesteps, n_dim_state))
@@ -82,7 +85,7 @@ for t in range(n_timesteps):
         filtered_state_covariances[t] = P0
     else:
         observation = 0
-        transition_offset = B * AccX_Value[t] # It's better to do B * (AccX_Value[t] - np.mean(AccX_Value))
+        transition_offset = B * (AccX_Value[t] - Acc_Mean)
         filtered_state_means[t], filtered_state_covariances[t] = (
             kf.filter_update(
                 filtered_state_mean = filtered_state_means[t-1],
@@ -107,7 +110,7 @@ axarr[1].plot(Time, filtered_state_means[:, 2], "r-", label="Estimated VelX")
 axarr[1].set_title('Velocity X')
 axarr[1].grid()
 axarr[1].legend()
-axarr[1].set_ylim([-0.6, 0.4])
+axarr[1].set_ylim([-0.6, 0.6])
 
 axarr[2].plot(Time, RefPosX, label="Reference PosX")
 axarr[2].plot(Time, filtered_state_means[:, 1], "r-", label="Estimated PosX")
