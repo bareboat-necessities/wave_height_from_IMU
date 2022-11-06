@@ -8,8 +8,7 @@ L = 100
 g = 9.8
 pi = 3.14
 k = 2 * pi / L
-c = 4 #np.sqrt(g / k)
-u = c * np.exp(k * b)
+c = np.sqrt(g / k)
 
 n_timesteps = 7000
 dt = 0.01
