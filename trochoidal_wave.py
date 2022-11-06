@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 a = 0
 b = -20
-L = 100
+L = 300
 g = 9.8
 pi = 3.14
 k = 2 * pi / L
