@@ -18,8 +18,8 @@ print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {u}')
 n_timesteps = 1000
 dt = 0.01
 
-times = np.zeros((n_timesteps))
-y_val = np.zeros((n_timesteps))
+x_val = np.zeros(n_timesteps)
+y_val = np.zeros(n_timesteps)
 
 for ii in range(n_timesteps):
     t = ii * dt
@@ -27,9 +27,9 @@ for ii in range(n_timesteps):
     #x = ii * dt
     #t = np.arcsin(x * k / np.exp(k * b)) / (k * c) + x
     y = - H * np.cos(k * c * t)
-    times[ii] = x + t * u
+    x_val[ii] = x + t * u
     y_val[ii] = y
 
-plt.plot(times, y_val, "r-")
+plt.plot(x_val, y_val, "r-")
 plt.grid()
 plt.show()
