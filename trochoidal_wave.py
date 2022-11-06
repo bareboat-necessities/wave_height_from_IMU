@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 a = 0
 b = -20
-L = 30
+L = 10
 g = 9.8
 k = 2 * np.pi / L
 c = np.sqrt(g / k)
