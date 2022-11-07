@@ -1,16 +1,17 @@
 import numpy as np
-
+from scipy import linalg
+from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 
-g = 9.806   # Gravitational G (m/s^2)
+g = 9.806  # Gravitational G (m/s^2)
 
-b = -1.5    # Rotation center in Y axis (m)
-L = 15      # Wave length (m)
+b = -1.5  # Rotation center in Y axis (m)
+L = 15  # Wave length (m)
 
-k = 2 * np.pi / L                  # Wave number (1/m)
-c = np.sqrt(g / k)                 # Speed in X direction  m/s
-H = np.exp(k * b) / k              # Wave height (m)
-T = L / c                          # Wave period (s)
+k = 2 * np.pi / L  # Wave number (1/m)
+c = np.sqrt(g / k)  # Speed in X direction  m/s
+H = np.exp(k * b) / k  # Wave height (m)
+T = L / c  # Wave period (s)
 
 print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}')
 
@@ -26,25 +27,30 @@ for ii in range(n_timesteps):
     t = ii * dt
     x = H * np.sin(k * c * t)
     y = - H * np.cos(k * c * t)
-    x_val[ii] = x/c + t
+    x_val[ii] = x / c + t
     y_val[ii] = y
     if ii > 0:
-        velY_val[ii] = (y - y_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
-        accY_val[ii] = (velY_val[ii] - velY_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
+        velY_val[ii] = (y - y_val[ii - 1]) / (x_val[ii] - x_val[ii - 1])
+        accY_val[ii] = (velY_val[ii] - velY_val[ii - 1]) / (x_val[ii] - x_val[ii - 1])
 
+n_off = int(T / dt / 10)
+interp_steps = n_timesteps - 2 * n_off
+time_val = np.zeros(interp_steps)
+y_val_A = np.zeros(interp_steps)
+velY_val_A = np.zeros(interp_steps)
+accY_val_A = np.zeros(interp_steps)
 
-time_val = np.zeros(n_timesteps)
-y_val_A = np.zeros(n_timesteps)
-velY_val_A = np.zeros(n_timesteps)
-accY_val_A = np.zeros(n_timesteps)
+f_Y = interp1d(x_val, y_val)
+f_velY = interp1d(x_val, velY_val)
+f_accY = interp1d(x_val, accY_val)
 
-for ii in range(n_timesteps):
-    t = ii * dt
+for ii in range(interp_steps):
+    t = (ii + n_off) * dt
     time_val[ii] = t
     if ii > 0:
-        y_val_A[ii] = y_val[ii-1] + dt * (y_val[ii] - y_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
-        velY_val_A[ii] = velY_val[ii-1] + dt * (velY_val[ii] - velY_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
-        accY_val_A[ii] = accY_val[ii-1] + dt * (accY_val[ii] - accY_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
+        y_val_A[ii] = f_Y(t)
+        velY_val_A[ii] = f_velY(t)
+        accY_val_A[ii] = f_accY(t)
 
 f, axarr = plt.subplots(3, sharex=True)
 
@@ -62,6 +68,5 @@ axarr[2].plot(x_val, accY_val, label="Reference Vertical Accel")
 axarr[2].plot(time_val, accY_val_A, label="Reference Vertical Accel Extrap")
 axarr[2].grid()
 axarr[2].legend()
-
 
 plt.show()
