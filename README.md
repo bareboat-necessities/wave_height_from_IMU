@@ -45,4 +45,15 @@ There may be any number of quadruplets like this, each describing a sensor. The 
     
 Example for (reporting displacement of a vessel from mean sea surface due to a wave of -0.33 m height):
 
-    $YDXDR,M,-0.33,M,DISPLACEMENT*<checksum>
+    $YDXDR,W,-0.33,M,VERT_DISPLACEMENT*<checksum>
+
+Or something like this from Autopilot:
+
+    
+    $APXDR,A,-0.087,M,VDIS*<checksum>
+    $APXDR,A,0.08,,VVEL*<checksum>
+    $APXDR,A,-0.087,,VACC*<checksum>
+    
+    VDIS - vertical displacement (m)
+    VVEL = vertical velocity (m/s)
+    VACC - vertical acceleration (m/s^2)
