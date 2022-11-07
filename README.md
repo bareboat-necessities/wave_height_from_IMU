@@ -55,5 +55,5 @@ Or something like this from Autopilot:
     $APXDR,A,-0.087,,VACC*<checksum>
     
     VDIS - vertical displacement (m)
-    VVEL = vertical velocity (m/s)
+    VVEL - vertical velocity (m/s)
     VACC - vertical acceleration (m/s^2)
