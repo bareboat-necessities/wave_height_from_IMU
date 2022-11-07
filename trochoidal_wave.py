@@ -19,6 +19,8 @@ n_timesteps = int(7 * T / dt)
 
 x_val = np.zeros(n_timesteps)
 y_val = np.zeros(n_timesteps)
+velY_val = np.zeros(n_timesteps)
+accY_val = np.zeros(n_timesteps)
 
 for ii in range(n_timesteps):
     t = ii * dt
@@ -26,7 +28,25 @@ for ii in range(n_timesteps):
     y = - H * np.cos(k * c * t)
     x_val[ii] = x/c + t
     y_val[ii] = y
+    if ii > 0:
+        velY_val[ii] = (y - y_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
+        accY_val[ii] = (velY_val[ii] - velY_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
 
-plt.plot(x_val, y_val, "r-")
-plt.grid()
+f, axarr = plt.subplots(3, sharex=True)
+
+axarr[0].plot(x_val, y_val, label="Reference Pos")
+axarr[0].set_title('Position')
+axarr[0].grid()
+axarr[0].legend()
+
+axarr[1].plot(x_val, velY_val, label="Reference Vertical Velocity")
+axarr[1].set_title('Vertical Velocity')
+axarr[1].grid()
+axarr[1].legend()
+
+axarr[2].plot(x_val, accY_val, label="Reference Vertical Accel")
+axarr[2].set_title('Vertical Accel')
+axarr[2].grid()
+axarr[2].legend()
+
 plt.show()
