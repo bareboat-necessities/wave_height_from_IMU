@@ -32,21 +32,36 @@ for ii in range(n_timesteps):
         velY_val[ii] = (y - y_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
         accY_val[ii] = (velY_val[ii] - velY_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
 
+
+time_val = np.zeros(n_timesteps)
+y_val_A = np.zeros(n_timesteps)
+velY_val_A = np.zeros(n_timesteps)
+accY_val_A = np.zeros(n_timesteps)
+
+for ii in range(n_timesteps):
+    t = ii * dt
+    time_val[ii] = t
+    if ii > 0:
+        y_val_A[ii] = y_val[ii-1] + dt * (y_val[ii] - y_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
+        velY_val_A[ii] = velY_val[ii-1] + dt * (velY_val[ii] - velY_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
+        accY_val_A[ii] = accY_val[ii-1] + dt * (accY_val[ii] - accY_val[ii-1]) / (x_val[ii] - x_val[ii - 1])
+
 f, axarr = plt.subplots(3, sharex=True)
 
 axarr[0].plot(x_val, y_val, label="Reference Pos")
-axarr[0].set_title('Position')
+axarr[0].plot(time_val, y_val_A, label="Reference Pos Extrap")
 axarr[0].grid()
 axarr[0].legend()
 
 axarr[1].plot(x_val, velY_val, label="Reference Vertical Velocity")
-axarr[1].set_title('Vertical Velocity')
+axarr[1].plot(time_val, velY_val_A, label="Reference Vertical Velocity Extrap")
 axarr[1].grid()
 axarr[1].legend()
 
 axarr[2].plot(x_val, accY_val, label="Reference Vertical Accel")
-axarr[2].set_title('Vertical Accel')
+axarr[2].plot(time_val, accY_val_A, label="Reference Vertical Accel Extrap")
 axarr[2].grid()
 axarr[2].legend()
+
 
 plt.show()
