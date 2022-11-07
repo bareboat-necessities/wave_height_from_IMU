@@ -16,7 +16,7 @@ T = L / c  # Wave period (s)
 print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}')
 
 dt = 0.01
-n_timesteps = int(7 * T / dt)
+n_timesteps = int(20 * T / dt)
 
 x_val = np.zeros(n_timesteps)
 y_val = np.zeros(n_timesteps)
@@ -68,5 +68,11 @@ axarr[2].plot(x_val, accY_val, label="Reference Vertical Accel")
 axarr[2].plot(time_val, accY_val_A, label="Reference Vertical Accel Extrap")
 axarr[2].grid()
 axarr[2].legend()
+
+file = open("trochoidal_wave.txt", "w+")
+for ii in range(interp_steps):
+    if ii > 0:
+        file.write(f'{time_val[ii]:,.4f}, {accY_val_A[ii]:,.8f}, {y_val_A[ii]:,.8f}, {velY_val_A[ii]:,.8f}\n')
+file.close()
 
 plt.show()
