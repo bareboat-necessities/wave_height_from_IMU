@@ -6,10 +6,11 @@ import matplotlib.pyplot as plt
 g = 9.806  # Gravitational G (m/s^2)
 
 b = -1.5  # Rotation center in Y axis (m)
-L = 15  # Wave length (m)
+L = 15    # Wave length (m)
+d = 300   # Depth (m)
 
 k = 2 * np.pi / L  # Wave number (1/m)
-c = np.sqrt(g / k)  # Speed in X direction  m/s
+c = np.sqrt(g / k * np.tanh(d * k))  # Speed in X direction  m/s
 H = np.exp(k * b) / k  # Wave height (m)
 T = L / c  # Wave period (s)
 
