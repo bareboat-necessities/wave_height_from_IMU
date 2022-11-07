@@ -53,7 +53,9 @@ Or something like this from Autopilot:
     $APXDR,A,-0.087,M,VDIS*<checksum>
     $APXDR,A,0.08,,VVEL*<checksum>
     $APXDR,A,-0.087,,VACC*<checksum>
+    $APMWH,3.44,f,1.05,M*<checksum>
     
     VDIS - vertical displacement (m)
     VVEL - vertical velocity (m/s)
     VACC - vertical acceleration (m/s^2)
+    $--MWH - wave height
