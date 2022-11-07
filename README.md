@@ -58,4 +58,4 @@ Or something like this from Autopilot:
     VDIS - vertical displacement (m)
     VVEL - vertical velocity (m/s)
     VACC - vertical acceleration (m/s^2)
-    $--MWH - wave height
+    $--MWH - wave height (feet and meters)
