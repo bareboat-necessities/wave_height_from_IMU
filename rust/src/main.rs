@@ -2,14 +2,17 @@ mod libs;
 
 use libs::{Env, Plot};
 
-fn read_data() -> (Vec<f32>, Vec<f32>) {
+fn read_data(path: &str) -> (Vec<f32>, Vec<f32>) {
     let mut x = Vec::new();
     let mut y = Vec::new();
 
-    for i in 1..100 {
-        x.push(i as f32);
-        y.push(100.0 - i as f32);
+    let rdr = csv::Reader::from_path(path);
+    for result in rdr.expect("Missing data file?").records().into_iter()  {
+        let record = result.expect("Missing record?");
+        x.push(record.get(0).expect("Missing field 0").trim().parse::<f32>().unwrap());
+        y.push(record.get(2).expect("Missing field 2").trim().parse::<f32>().unwrap());
     }
+    
     (x, y)
 }
 
@@ -27,6 +30,6 @@ fn plot_data(x: &Vec<f32>, y: &Vec<f32>) {
 }
 
 fn main() {
-    let (x, y) = read_data();
+    let (x, y) = read_data("../trochoidal_wave.txt");
     plot_data(&x, &y);
 }
