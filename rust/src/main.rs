@@ -13,9 +13,7 @@ fn read_data() -> (Vec<f32>, Vec<f32>) {
     (x, y)
 }
 
-fn main() {
-    let (x, y) = read_data();
-
+fn plot_data(x: &Vec<f32>, y: &Vec<f32>) {
     let env = Env::new();
     let plot = Plot::new(&env);
 
@@ -26,4 +24,9 @@ fn main() {
     plot.title("Simple Plot");
 
     plot.show();
+}
+
+fn main() {
+    let (x, y) = read_data();
+    plot_data(&x, &y);
 }
