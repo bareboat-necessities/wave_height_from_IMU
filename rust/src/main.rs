@@ -1,5 +1,6 @@
 mod libs;
 
+use csv::StringRecord;
 use libs::{Env, Plot};
 
 fn read_data(path: &str) -> (Vec<f32>, Vec<f32>) {
@@ -9,11 +10,15 @@ fn read_data(path: &str) -> (Vec<f32>, Vec<f32>) {
     let rdr = csv::Reader::from_path(path);
     for result in rdr.expect("Missing data file?").records().into_iter()  {
         let record = result.expect("Missing record?");
-        x.push(record.get(0).expect("Missing field 0").trim().parse::<f32>().unwrap());
-        y.push(record.get(2).expect("Missing field 2").trim().parse::<f32>().unwrap());
+        x.push(get_as(&record, 0));
+        y.push(get_as(&record, 2));
     }
-    
+
     (x, y)
+}
+
+fn get_as(record: &StringRecord, index: usize) -> f32 {
+    record.get(index).expect(&*format!("Missing field {index}")).trim().parse::<f32>().unwrap()
 }
 
 fn plot_data(x: &Vec<f32>, y: &Vec<f32>) {
