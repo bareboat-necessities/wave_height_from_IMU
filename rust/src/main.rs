@@ -2,7 +2,7 @@ mod libs;
 
 use libs::{Env, Plot};
 
-fn main() {
+fn read_data() -> (Vec<f32>, Vec<f32>) {
     let mut x = Vec::new();
     let mut y = Vec::new();
 
@@ -10,6 +10,11 @@ fn main() {
         x.push(i as f32);
         y.push(100.0 - i as f32);
     }
+    (x, y)
+}
+
+fn main() {
+    let (x, y) = read_data();
 
     let env = Env::new();
     let plot = Plot::new(&env);
