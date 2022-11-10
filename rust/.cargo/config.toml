@@ -1,0 +1,2 @@
+[env]
+#PYTHON_SYS_EXECUTABLE = { value = "/usr/bin/python3", relative = false }
