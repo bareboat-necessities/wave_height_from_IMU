@@ -1,18 +1,24 @@
-use cpython::{Python, PyDict, PyResult};
+mod libs;
+
+use libs::{Env, Plot};
 
 fn main() {
-    let gil = Python::acquire_gil();
-    hello(gil.python()).unwrap();
-}
+    let mut x = Vec::new();
+    let mut y = Vec::new();
 
-fn hello(py: Python) -> PyResult<()> {
-    let sys = py.import("sys")?;
-    let version: String = sys.get(py, "version")?.extract(py)?;
+    for i in 1..100 {
+        x.push(i as f32);
+        y.push(100.0 - i as f32);
+    }
 
-    let locals = PyDict::new(py);
-    locals.set_item(py, "os", py.import("os")?)?;
-    let user: String = py.eval("os.getenv('USER') or os.getenv('USERNAME')", None, Some(&locals))?.extract(py)?;
+    let env = Env::new();
+    let plot = Plot::new(&env);
 
-    println!("Hello {}, I'm Python {}", user, version);
-    Ok(())
+    plot.plot(&x, &y);
+    plot.grid(true);
+    plot.xlabel("X");
+    plot.ylabel("Y");
+    plot.title("Simple Plot");
+
+    plot.show();
 }
