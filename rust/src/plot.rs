@@ -30,7 +30,15 @@ impl<'p> Plot<'p> {
         let _ = self.plt.call(self.py, "show", PyTuple::empty(self.py), None).unwrap();
     }
 
-    pub fn plot(&self, x: &[f32], y: &[f32]) {
+    pub fn draw(&self) {
+        let _ = self.plt.call(self.py, "draw", PyTuple::empty(self.py), None).unwrap();
+    }
+
+    pub fn set_ylim(&self, ymin: f64, ymax: f64) {
+        let _ = self.plt.call(self.py, "ylim", (ymin, ymax), None).unwrap();
+    }
+
+    pub fn plot(&self, x: &[f64], y: &[f64]) {
         assert_eq!(x.len(), y.len());
         let _ = self.plt.call(self.py, "plot", (x, y), None).unwrap();
     }
