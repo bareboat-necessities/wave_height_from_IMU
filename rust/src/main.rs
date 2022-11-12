@@ -5,7 +5,7 @@ extern crate rulinalg;
 extern crate linearkalman;
 
 use rulinalg::vector::Vector;
-use linearkalman::{KalmanFilter};
+use linearkalman::{KalmanFilter, KalmanState, update_step, predict_step};
 
 use csv::StringRecord;
 use plot::{Env, Plot};
@@ -68,7 +68,15 @@ fn main() {
 
     // With no integral drift correction
     // TODO: implement same as in wave_height_from_IMU.py
-    let (filtered, _ /*predicted*/) = kf.filter(&data);
+    let mut predicted: Vec<KalmanState> = Vec::with_capacity(n_timesteps+1);
+    let mut filtered: Vec<KalmanState> = Vec::with_capacity(n_timesteps);
+
+    predicted.push(KalmanState { x: (kf.x0).clone(), p: (kf.p0).clone() });
+
+    for k in 0..n_timesteps {
+        filtered.push(update_step(&kf, &predicted[k], &data[k]));
+        predicted.push(predict_step(&kf, &filtered[k]));
+    }
 
     let mut result_pos: Vec<f64> = Vec::new();
     //let mut result_vel: Vec<f64> = Vec::new();
