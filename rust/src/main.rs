@@ -67,6 +67,7 @@ fn main() {
     }
 
     // With no integral drift correction
+    // TODO: implement same as in wave_height_from_IMU.py
     let (filtered, _ /*predicted*/) = kf.filter(&data);
 
     let mut result_pos: Vec<f64> = Vec::new();
