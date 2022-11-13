@@ -34,21 +34,24 @@ fn main() {
     let (time, acc, pos, _ /*vel*/) = read_data("../test-data.txt");
 
     let dt = time[1] - time[0];
-    let acc_x_variance = 0.0007;
+    let pos_integral_trans_variance: f64 = 100.0;
+    let pos_integral_variance: f64 = 100.0;
 
-    let x0 = vector![0.0, 0.0, acc[0]];
-    let p0 = matrix![0.0, 0.0, 0.0;
-                                0.0, 0.0, 0.0;
-                                0.0, 0.0, acc_x_variance];
+    let b = Vector::new(vec![((1.0 / 6.0) * dt.powf(3.0)), (0.5 * dt.powf( 2.0)), dt]);
+
+    let x0 = vector![0.0, 0.0, 0.0];
+    let p0 = matrix![pos_integral_variance, 0.0, 0.0;
+                                                  0.0, 1.0, 0.0;
+                                                  0.0, 0.0, 1.0];
     let kf = KalmanFilter {
         // Process noise covariance
-        q: matrix![0.1, 0.0, 0.0;
-                   0.0, 0.2, 0.0;
-                   0.0, 0.0, 0.0001],
+        q: matrix![pos_integral_trans_variance, 0.0, 0.0;
+                                           0.0, 0.2, 0.0;
+                                           0.0, 0.0, 0.1],
         // Measurement noise matrix
-        r: matrix![acc_x_variance],
+        r: matrix![pos_integral_variance],
         // Observation matrix
-        h: matrix![0.0, 0.0, 1.0],
+        h: matrix![1.0, 0.0, 0.0],
         // State transition matrix
         f: matrix![1.0,  dt,  dt.powf(2.0)/2.0;
                    0.0, 1.0,                dt;
@@ -62,12 +65,13 @@ fn main() {
     let n_timesteps = time.len();
 
     let mut data: Vec<Vector<f64>> = Vec::new();
-    for t in 0..n_timesteps {
-        data.push(Vector::new(vec![acc[t]]));
+    for _t in 0..n_timesteps {
+        data.push(Vector::new(vec![0.0]));
     }
 
+    let acc_mean = -0.08; // TODO: calculate it
+
     // With no integral drift correction
-    // TODO: implement same as in wave_height_from_IMU.py
     let mut predicted: Vec<KalmanState> = Vec::with_capacity(n_timesteps+1);
     let mut filtered: Vec<KalmanState> = Vec::with_capacity(n_timesteps);
 
@@ -75,14 +79,15 @@ fn main() {
 
     for k in 0..n_timesteps {
         filtered.push(update_step(&kf, &predicted[k], &data[k]));
+        filtered[k].x = &filtered[k].x + &b * (acc[k] - acc_mean);
         predicted.push(predict_step(&kf, &filtered[k]));
     }
 
     let mut result_pos: Vec<f64> = Vec::new();
     //let mut result_vel: Vec<f64> = Vec::new();
     for t in 0..n_timesteps {
-        result_pos.push(filtered[t].x[0]);
-        //result_vel.push(filtered[t].x[1]);
+        result_pos.push(filtered[t].x[1]);
+        //result_vel.push(filtered[t].x[2]);
     }
 
     let env = Env::new();
@@ -94,7 +99,7 @@ fn main() {
     plot.xlabel("Time");
     plot.ylabel("Pos");
     plot.title("Est Pos vs Ref Pos");
-    plot.set_ylim(-20.0, 2.0);
+    plot.set_ylim(-2.0, 2.0);
     plot.draw();
     plot.show();
 }
