@@ -30,6 +30,10 @@ fn get_f64(record: &StringRecord, index: usize) -> f64 {
     record.get(index).expect(&*format!("Missing field {index}")).trim().parse::<f64>().unwrap()
 }
 
+fn mean(numbers: &Vec<f64>) -> f64 {
+    numbers.iter().sum::<f64>() as f64 / numbers.len() as f64
+}
+
 fn main() {
     let (time, acc, pos, _ /*vel*/) = read_data("../test-data.txt");
 
@@ -69,7 +73,7 @@ fn main() {
         data.push(Vector::new(vec![0.0]));
     }
 
-    let acc_mean = -0.08; // TODO: calculate it
+    let acc_mean = mean(&acc);
 
     // With no integral drift correction
     let mut predicted: Vec<KalmanState> = Vec::with_capacity(n_timesteps+1);
