@@ -13,7 +13,7 @@ use mpu9250::{Mpu9250, MargMeasurements};
 
 use ahrs::{Ahrs, Madgwick};
 use nalgebra::Vector3;
-use std::f64;
+use std::f32;
 
 fn main() -> io::Result<()> {
     let i2c = I2cdev::new("/dev/i2c-1").expect("unable to open /dev/i2c-1");
@@ -44,7 +44,7 @@ fn main() -> io::Result<()> {
         // Run inputs through AHRS filter (gyroscope must be radians/s)
         let quat = ahrs
             .update(
-                &(gyroscope * (f64::consts::PI / 180.0)),
+                &(gyroscope * (f32::consts::PI / 180.0)),
                 &accelerometer,
                 &magnetometer,
             )
