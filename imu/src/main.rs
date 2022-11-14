@@ -30,11 +30,11 @@ fn main() -> io::Result<()> {
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
+    let mut ahrs = Madgwick::default();
     writeln!(&mut stdout,
              "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll | Pitch | Yaw")?;
     loop {
         let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
-        let mut ahrs = Madgwick::default();
 
         // Obtain sensor values from a source
         let gyroscope = Vector3::new(all.gyro[0], all.gyro[1], all.gyro[2]);
