@@ -19,9 +19,8 @@ use embedded_hal::prelude::_embedded_hal_blocking_delay_DelayMs;
 fn main() -> io::Result<()> {
     let i2c = I2cdev::new("/dev/i2c-1").expect("unable to open /dev/i2c-1");
 
-    let delay = &mut Delay;
     let mut mpu9250 =
-        Mpu9250::marg_default(i2c, delay).expect("unable to make MPU9250");
+        Mpu9250::marg_default(i2c, &mut Delay).expect("unable to make MPU9250");
 
     let who_am_i = mpu9250.who_am_i().expect("could not read WHO_AM_I");
     let mag_who_am_i = mpu9250.ak8963_who_am_i()
@@ -58,7 +57,7 @@ fn main() -> io::Result<()> {
             .update(
                 &gyroscope,
                 &accelerometer,
-                &magnetometer,
+                &(magnetometer * (f64::consts::PI / 180.0))
             )
             .unwrap();
         let (roll, pitch, yaw) = quat.euler_angles();
