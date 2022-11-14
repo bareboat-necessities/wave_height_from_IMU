@@ -31,7 +31,7 @@ fn main() -> io::Result<()> {
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
-    let wait_sec = 0.1;
+    let wait_sec = 0.02;
 
     let mut ahrs = Madgwick::new_with_quat(
         wait_sec,
@@ -57,7 +57,7 @@ fn main() -> io::Result<()> {
             .update(
                 &gyroscope,
                 &accelerometer,
-                &(magnetometer * (f64::consts::PI / 180.0))
+                &magnetometer
             )
             .unwrap();
         let (roll, pitch, yaw) = quat.euler_angles();
