@@ -42,7 +42,7 @@ fn main() -> io::Result<()> {
             nalgebra::zero(),
         )));
     writeln!(&mut stdout,
-             "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Accel Vert(m/s^2)")?;
+             "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Vert Acc - g (m/s^2)")?;
     loop {
         let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
 
@@ -64,8 +64,8 @@ fn main() -> io::Result<()> {
         let rotated_acc= quat.transform_vector(
             &Vector3::new(all.accel[0] as f64, all.accel[1] as f64, all.accel[2] as f64));
 
-
-
+        let g = 9.806;
+        let vert_acc_minus_g = rotated_acc[2] - g;
         write!(&mut stdout,
                "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>6.2}",
                all.accel[0],
@@ -81,7 +81,7 @@ fn main() -> io::Result<()> {
                roll * 180.0 / f64::consts::PI,
                pitch * 180.0 / f64::consts::PI,
                yaw * 180.0 / f64::consts::PI,
-               rotated_acc[2]
+               vert_acc_minus_g
         )?;
         stdout.flush()?;
         thread::sleep(Duration::from_micros((wait_sec * 1000000.0) as u64));
