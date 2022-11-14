@@ -12,7 +12,7 @@ use hal::I2cdev;
 use mpu9250::{Mpu9250, MargMeasurements};
 
 fn main() -> io::Result<()> {
-    let i2c = I2cdev::new("/dev/i2c-2").expect("unable to open /dev/i2c-2");
+    let i2c = I2cdev::new("/dev/i2c-1").expect("unable to open /dev/i2c-1");
 
     let mut mpu9250 =
         Mpu9250::marg_default(i2c, &mut Delay).expect("unable to make MPU9250");
