@@ -80,6 +80,6 @@ fn main() -> io::Result<()> {
                yaw * 180.0 / f64::consts::PI
         )?;
         stdout.flush()?;
-        thread::sleep(Duration::from_micros(wait_sec * 1000000));
+        thread::sleep(Duration::from_micros((wait_sec * 1000000.0) as u64));
     }
 }
