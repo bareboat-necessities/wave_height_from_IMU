@@ -14,7 +14,6 @@ use mpu9250::{Mpu9250, MargMeasurements};
 use ahrs::{Ahrs, Madgwick};
 use nalgebra::{Vector3, Quaternion, UnitQuaternion};
 use std::f64;
-use embedded_hal::prelude::_embedded_hal_blocking_delay_DelayMs;
 
 fn main() -> io::Result<()> {
     let i2c = I2cdev::new("/dev/i2c-1").expect("unable to open /dev/i2c-1");
