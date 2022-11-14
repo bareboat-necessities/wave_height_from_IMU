@@ -41,10 +41,10 @@ fn main() -> io::Result<()> {
                 N::one(),
                 N::zero(),
                 N::zero(),
-                N::zero())
-        );
+                N::zero(),
+        )));
     writeln!(&mut stdout,
-             "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll | Pitch | Yaw")?;
+             "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll  | Pitch | Yaw")?;
     loop {
         let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
 
@@ -64,7 +64,7 @@ fn main() -> io::Result<()> {
         let (roll, pitch, yaw) = quat.euler_angles();
 
         write!(&mut stdout,
-               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>4.1} | {:>4.1} | {:>4.1}",
+               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>5.1} | {:>5.1} | {:>5.1}",
                all.accel[0],
                all.accel[1],
                all.accel[2],
