@@ -8,7 +8,7 @@ version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dce5b6279fad0a36b3ef4fd938fb6b2751a8899ff8275fb9aba9a25345ca9992"
 dependencies = [
- "nalgebra",
+ "nalgebra 0.30.1",
  "num-traits",
  "simba",
 ]
@@ -180,6 +180,22 @@ name = "nalgebra"
 version = "0.30.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4fb2d0de08694bed883320212c18ee3008576bfe8c306f4c3c4a58b4876998be"
+dependencies = [
+ "approx",
+ "matrixmultiply",
+ "nalgebra-macros",
+ "num-complex",
+ "num-rational",
+ "num-traits",
+ "simba",
+ "typenum",
+]
+
+[[package]]
+name = "nalgebra"
+version = "0.31.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "20bd243ab3dbb395b39ee730402d2e5405e448c75133ec49cc977762c4cba3d1"
 dependencies = [
  "approx",
  "matrixmultiply",
@@ -427,6 +443,7 @@ dependencies = [
  "libm",
  "linux-embedded-hal",
  "mpu9250",
+ "nalgebra 0.31.4",
 ]
 
 [[package]]
