@@ -13,7 +13,7 @@ use mpu9250::{Mpu9250, MargMeasurements};
 
 use ahrs::{Ahrs, Madgwick};
 use nalgebra::Vector3;
-use std::f32;
+use std::f64;
 
 fn main() -> io::Result<()> {
     let i2c = I2cdev::new("/dev/i2c-1").expect("unable to open /dev/i2c-1");
@@ -37,14 +37,14 @@ fn main() -> io::Result<()> {
         let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
 
         // Obtain sensor values from a source
-        let gyroscope = Vector3::new(all.gyro[0], all.gyro[1], all.gyro[2]);
-        let accelerometer = Vector3::new(all.accel[0], all.accel[1], all.accel[2]);
-        let magnetometer = Vector3::new(all.mag[0], all.mag[1], all.mag[2]);
+        let gyroscope: Vector3<f64> = Vector3::new(all.gyro[0] as f64, all.gyro[1] as f64, all.gyro[2] as f64);
+        let accelerometer: Vector3<f64> = Vector3::new(all.accel[0] as f64, all.accel[1] as f64, all.accel[2] as f64);
+        let magnetometer: Vector3<f64> = Vector3::new(all.mag[0] as f64, all.mag[1] as f64, all.mag[2] as f64);
 
         // Run inputs through AHRS filter (gyroscope must be radians/s)
         let quat = ahrs
             .update(
-                &(gyroscope * (f32::consts::PI / 180.0)),
+                &(gyroscope * (f64::consts::PI / 180.0)),
                 &accelerometer,
                 &magnetometer,
             )
