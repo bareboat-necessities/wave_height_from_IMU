@@ -9,7 +9,7 @@ use std::time::Duration;
 
 use hal::Delay;
 use hal::I2cdev;
-use mpu9250::Mpu9250;
+use mpu9250::{Mpu9250, MargMeasurements};
 
 fn main() -> io::Result<()> {
     let i2c = I2cdev::new("/dev/i2c-2").expect("unable to open /dev/i2c-2");
@@ -29,7 +29,7 @@ fn main() -> io::Result<()> {
     writeln!(&mut stdout,
              "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C)")?;
     loop {
-        let all = mpu9250.all().expect("unable to read from MPU!");
+        let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
         write!(&mut stdout,
                "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1} ",
                all.accel[0],
