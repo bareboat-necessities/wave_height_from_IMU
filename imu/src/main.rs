@@ -38,10 +38,10 @@ fn main() -> io::Result<()> {
         wait_sec,
         0.1f64,
         UnitQuaternion::new_unchecked(Quaternion::new(
-                N::one(),
-                N::zero(),
-                N::zero(),
-                N::zero(),
+            f64::one(),
+            f64::zero(),
+            f64::zero(),
+            f64::zero(),
         )));
     writeln!(&mut stdout,
              "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll  | Pitch | Yaw")?;
