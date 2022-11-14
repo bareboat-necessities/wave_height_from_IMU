@@ -41,7 +41,7 @@ fn main() {
     let pos_integral_trans_variance: f64 = 100.0;
     let pos_integral_variance: f64 = 100.0;
 
-    let b = Vector::new(vec![((1.0 / 6.0) * dt.powf(3.0)), (0.5 * dt.powf( 2.0)), dt]);
+    let b = Vector::new(vec![((1.0 / 6.0) * dt.powi(3)), (0.5 * dt.powi(2)), dt]);
 
     let x0 = vector![0.0, 0.0, 0.0];
     let p0 = matrix![pos_integral_variance, 0.0, 0.0;
@@ -57,9 +57,9 @@ fn main() {
         // Observation matrix
         h: matrix![1.0, 0.0, 0.0],
         // State transition matrix
-        f: matrix![1.0,  dt,  dt.powf(2.0)/2.0;
-                   0.0, 1.0,                dt;
-                   0.0, 0.0,               1.0],
+        f: matrix![1.0,  dt,  dt.powi(2)/2.0;
+                   0.0, 1.0,              dt;
+                   0.0, 0.0,             1.0],
         // Initial guess for state mean at time 0
         x0: x0,
         // Initial guess for state covariance at time 0
