@@ -44,7 +44,7 @@ fn main() -> io::Result<()> {
         // Run inputs through AHRS filter (gyroscope must be radians/s)
         let quat = ahrs
             .update(
-                &(gyroscope * (f64::consts::PI / 180.0)),
+                &gyroscope,
                 &accelerometer,
                 &magnetometer,
             )
@@ -63,9 +63,9 @@ fn main() -> io::Result<()> {
                all.mag[1],
                all.mag[2],
                all.temp,
-               roll,
-               pitch,
-               yaw
+               roll * 180.0 / f64::consts::PI,
+               pitch * 180.0 / f64::consts::PI,
+               yaw * 180.0 / f64::consts::PI
         )?;
         stdout.flush()?;
         thread::sleep(Duration::from_micros(100000));
