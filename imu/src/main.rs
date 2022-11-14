@@ -12,14 +12,16 @@ use hal::I2cdev;
 use mpu9250::{Mpu9250, MargMeasurements};
 
 use ahrs::{Ahrs, Madgwick};
-use nalgebra::Vector3;
+use nalgebra::{Vector3, Quaternion, UnitQuaternion};
 use std::f64;
+use embedded_hal::prelude::_embedded_hal_blocking_delay_DelayMs;
 
 fn main() -> io::Result<()> {
     let i2c = I2cdev::new("/dev/i2c-1").expect("unable to open /dev/i2c-1");
 
+    let delay = &mut Delay;
     let mut mpu9250 =
-        Mpu9250::marg_default(i2c, &mut Delay).expect("unable to make MPU9250");
+        Mpu9250::marg_default(i2c, delay).expect("unable to make MPU9250");
 
     let who_am_i = mpu9250.who_am_i().expect("could not read WHO_AM_I");
     let mag_who_am_i = mpu9250.ak8963_who_am_i()
@@ -30,7 +32,17 @@ fn main() -> io::Result<()> {
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
-    let mut ahrs = Madgwick::default();
+    let wait_sec = 0.1;
+
+    let mut ahrs = Madgwick::new_with_quat(
+        wait_sec,
+        0.1f64,
+        UnitQuaternion::new_unchecked(Quaternion::new(
+                N::one(),
+                N::zero(),
+                N::zero(),
+                N::zero())
+        );
     writeln!(&mut stdout,
              "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll | Pitch | Yaw")?;
     loop {
@@ -68,6 +80,6 @@ fn main() -> io::Result<()> {
                yaw * 180.0 / f64::consts::PI
         )?;
         stdout.flush()?;
-        thread::sleep(Duration::from_micros(100000));
+        thread::sleep(Duration::from_micros(wait_sec * 1000000));
     }
 }
