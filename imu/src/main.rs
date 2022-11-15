@@ -76,9 +76,9 @@ fn main() -> io::Result<()> {
                    0.0, 1.0,              dt;
                    0.0, 0.0,             1.0],
         // Initial guess for state mean at time 0
-        x0: x0,
+        x0,
         // Initial guess for state covariance at time 0
-        p0: p0,
+        p0,
     };
 
     let mut predicted: KalmanState = KalmanState { x: (kf.x0).clone(), p: (kf.p0).clone() };
@@ -114,16 +114,17 @@ fn main() -> io::Result<()> {
 
         let g = 9.806;
         let vert_acc_minus_g = rotated_acc[2] - g;
-        if t <= SAMPLES {
-            acc_mean.add_sample(vert_acc_minus_g);
-            t = t + 1;
-        }
 
         filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
         filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
         predicted = predict_step(&kf, &filtered);
 
         let vert_pos = filtered.x[1];
+
+        if t <= SAMPLES {
+            acc_mean.add_sample(vert_acc_minus_g);
+            t = t + 1;
+        }
 
         write!(&mut stdout,
                "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>6.2}               | {:>6.2}",
@@ -141,7 +142,7 @@ fn main() -> io::Result<()> {
                pitch * 180.0 / f64::consts::PI,
                yaw * 180.0 / f64::consts::PI,
                vert_acc_minus_g,
-               acc_mean.get_average()
+               vert_pos
         )?;
         stdout.flush()?;
         thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
