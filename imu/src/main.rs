@@ -116,8 +116,8 @@ fn main() -> io::Result<()> {
         let vert_acc_minus_g = rotated_acc[2] - g;
         if t <= SAMPLES {
             acc_mean.add_sample(vert_acc_minus_g);
+            t = t + 1;
         }
-        t = t + 1;
 
         filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
         filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
@@ -141,7 +141,7 @@ fn main() -> io::Result<()> {
                pitch * 180.0 / f64::consts::PI,
                yaw * 180.0 / f64::consts::PI,
                vert_acc_minus_g,
-               t as f64
+               vert_pos
         )?;
         stdout.flush()?;
         thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
