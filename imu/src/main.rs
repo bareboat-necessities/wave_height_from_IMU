@@ -43,7 +43,7 @@ fn main() -> io::Result<()> {
     const WAIT_SEC: f64 = 0.02;
 
     let mut ahrs = Madgwick::new_with_quat(
-        WAIT_SEC,
+        WAIT_SEC * 200,
         0.1f64,
         UnitQuaternion::new_unchecked(Quaternion::new(
             nalgebra::one(),
@@ -52,8 +52,8 @@ fn main() -> io::Result<()> {
             nalgebra::zero(),
         )));
 
-    let pos_integral_trans_variance: f64 = 1.0;
-    let pos_integral_variance: f64 = 1.0;
+    let pos_integral_trans_variance: f64 = 50.0;
+    let pos_integral_variance: f64 = 50.0;
 
     let dt = WAIT_SEC;
     let b = Vector::new(vec![((1.0 / 6.0) * dt.powi(3)), (0.5 * dt.powi(2)), dt]);
