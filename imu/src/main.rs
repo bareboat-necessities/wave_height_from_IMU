@@ -23,7 +23,7 @@ use std::f64;
 use rulinalg::vector::Vector;
 use linearkalman::{KalmanFilter, KalmanState, update_step, predict_step};
 
-use sma::{SingleSumSMA, SMA};
+use sma::{SumTreeSMA, SMA};
 
 fn main() -> io::Result<()> {
     let i2c = I2cdev::new("/dev/i2c-1").expect("unable to open /dev/i2c-1");
@@ -84,7 +84,7 @@ fn main() -> io::Result<()> {
     let mut predicted: KalmanState = KalmanState { x: (kf.x0).clone(), p: (kf.p0).clone() };
     let mut filtered: KalmanState;
     const SAMPLES: usize = (45.0 / WAIT_SEC) as usize;
-    let mut acc_mean = SingleSumSMA::<f64, f64, SAMPLES>::from_zero(0.0);
+    let mut acc_mean = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(0.0);
 
     writeln!(&mut stdout, "Give process a min to self calibrate\n")?;
     writeln!(&mut stdout,
