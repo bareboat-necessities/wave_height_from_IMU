@@ -86,7 +86,7 @@ fn main() -> io::Result<()> {
     const SAMPLES: usize = (45.0 / WAIT_SEC) as usize;
     let mut acc_mean = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(0.0);
 
-    writeln!(&mut stdout, "Give process a min to self calibrate\n")?;
+    writeln!(&mut stdout, "Give process a couple of minutes to self calibrate\n")?;
     writeln!(&mut stdout,
              "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Vert Acc - g (m/s^2) | VPos(m)")?;
 
@@ -121,7 +121,7 @@ fn main() -> io::Result<()> {
 
         let vert_pos = filtered.x[1];
 
-        if t <= SAMPLES {
+        if SAMPLES <= t && t <= (2 * SAMPLES) {
             acc_mean.add_sample(vert_acc_minus_g);
             t = t + 1;
         }
