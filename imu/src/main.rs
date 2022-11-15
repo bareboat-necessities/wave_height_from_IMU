@@ -116,7 +116,7 @@ fn main() -> io::Result<()> {
         if t <= SAMPLES {
             acc_mean.add_sample(vert_acc_minus_g);
         }
-        t = t + 1;
+        t = &t + 1;
 
         filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
         filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
