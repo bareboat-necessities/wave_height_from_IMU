@@ -3,6 +3,10 @@
 extern crate linux_embedded_hal as hal;
 extern crate mpu9250;
 
+#[macro_use]
+extern crate rulinalg;
+extern crate linearkalman;
+
 use std::io::{self, Write};
 use std::thread;
 use std::time::Duration;
@@ -14,6 +18,9 @@ use mpu9250::{Mpu9250, MargMeasurements};
 use ahrs::{Ahrs, Madgwick};
 use nalgebra::{Vector3, Quaternion, UnitQuaternion};
 use std::f64;
+
+use rulinalg::vector::Vector;
+use linearkalman::{KalmanFilter, KalmanState, update_step, predict_step};
 
 fn main() -> io::Result<()> {
     let i2c = I2cdev::new("/dev/i2c-1").expect("unable to open /dev/i2c-1");
@@ -41,8 +48,41 @@ fn main() -> io::Result<()> {
             nalgebra::zero(),
             nalgebra::zero(),
         )));
+
+
+    let pos_integral_trans_variance: f64 = 100.0;
+    let pos_integral_variance: f64 = 100.0;
+
+    let b = Vector::new(vec![((1.0 / 6.0) * dt.powi(3)), (0.5 * dt.powi(2)), dt]);
+
+    let x0 = vector![0.0, 0.0, 0.0];
+    let p0 = matrix![pos_integral_variance, 0.0, 0.0;
+                                                  0.0, 1.0, 0.0;
+                                                  0.0, 0.0, 1.0];
+    let kf = KalmanFilter {
+        // Process noise covariance
+        q: matrix![pos_integral_trans_variance, 0.0, 0.0;
+                                           0.0, 0.2, 0.0;
+                                           0.0, 0.0, 0.1],
+        // Measurement noise matrix
+        r: matrix![pos_integral_variance],
+        // Observation matrix
+        h: matrix![1.0, 0.0, 0.0],
+        // State transition matrix
+        f: matrix![1.0,  dt,  dt.powi(2)/2.0;
+                   0.0, 1.0,              dt;
+                   0.0, 0.0,             1.0],
+        // Initial guess for state mean at time 0
+        x0: x0,
+        // Initial guess for state covariance at time 0
+        p0: p0,
+    };
+
+    let mut predicted: KalmanState = KalmanState { x: (kf.x0).clone(), p: (kf.p0).clone() };
+    let mut filtered: KalmanState;
+
     writeln!(&mut stdout,
-             "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Vert Acc - g (m/s^2)")?;
+             "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Vert Acc - g (m/s^2) | VPos(m)")?;
     loop {
         let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
 
@@ -66,8 +106,15 @@ fn main() -> io::Result<()> {
 
         let g = 9.806;
         let vert_acc_minus_g = rotated_acc[2] - g;
+
+        filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
+        filtered.x = &filtered.x + &b * (vert_acc_minus_g - 0.0/*acc_mean*/);
+        predicted = predict_step(&kf, &filtered);
+
+        let vert_pos = filtered.x[1];
+
         write!(&mut stdout,
-               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>6.2}",
+               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>6.2} | {:>6.2}",
                all.accel[0],
                all.accel[1],
                all.accel[2],
@@ -81,7 +128,8 @@ fn main() -> io::Result<()> {
                roll * 180.0 / f64::consts::PI,
                pitch * 180.0 / f64::consts::PI,
                yaw * 180.0 / f64::consts::PI,
-               vert_acc_minus_g
+               vert_acc_minus_g,
+               vert_pos
         )?;
         stdout.flush()?;
         thread::sleep(Duration::from_micros((wait_sec * 1000000.0) as u64));
