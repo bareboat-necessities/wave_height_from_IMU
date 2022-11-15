@@ -14,7 +14,7 @@ use std::time::Duration;
 
 use hal::Delay;
 use hal::I2cdev;
-use mpu9250::{Mpu9250, MargMeasurements};
+use mpu9250::{Mpu9250, MargMeasurements, AccelDataRate, Dlpf};
 
 use ahrs::{Ahrs, Madgwick};
 use nalgebra::{Vector3, Quaternion, UnitQuaternion};
@@ -41,6 +41,8 @@ fn main() -> io::Result<()> {
     let acc_bias: [f32; 3] = mpu9250.get_accel_bias().expect("Err accel_bias");
     println!("accel_bias {:>7.3} {:>7.3} {:>7.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
     println!("accel_resolution {:>15.10}", mpu9250.accel_resolution());
+
+    mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_0)).expect("Err setting rate");
 
     let gyro_bias: [f32; 3] = mpu9250.get_gyro_bias().expect("Err gyro_bias");
     println!("gyro_bias {:>7.3} {:>7.3} {:>7.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
