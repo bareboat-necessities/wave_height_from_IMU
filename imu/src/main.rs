@@ -115,7 +115,7 @@ fn main() -> io::Result<()> {
         let (roll, pitch, yaw) = quat.euler_angles();
 
         let rotated_acc= quat.transform_vector(
-            &Vector3::new(all.accel[0] as f64, all.accel[1] as f64, all.accel[2] as f64));
+            &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
 
         let vert_acc_minus_g = rotated_acc[2] - g;
 
