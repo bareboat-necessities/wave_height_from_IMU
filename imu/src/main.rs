@@ -85,6 +85,7 @@ fn main() -> io::Result<()> {
     let mut filtered: KalmanState;
     const SAMPLES: usize = (45.0 / WAIT_SEC) as usize;
     let mut acc_mean = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(0.0);
+    let mut pos_mean = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(0.0);
 
     writeln!(&mut stdout, "Give process a couple of minutes to self calibrate\n")?;
     writeln!(&mut stdout,
@@ -123,6 +124,7 @@ fn main() -> io::Result<()> {
 
         if SAMPLES <= t && t <= (2 * SAMPLES) {
             acc_mean.add_sample(vert_acc_minus_g);
+            pos_mean.add_sample(vert_pos);
             t = t + 1;
         }
 
