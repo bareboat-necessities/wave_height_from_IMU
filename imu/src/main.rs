@@ -40,8 +40,11 @@ fn main() -> io::Result<()> {
 
     let acc_bias: [f32; 3] = mpu9250.get_accel_bias().expect("Err accel_bias");
     println!("accel_bias {:>7.3} {:>7.3} {:>7.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
+    println!("accel_resolution {:>15.10}", mpu9250.accel_resolution());
+
     let gyro_bias: [f32; 3] = mpu9250.get_gyro_bias().expect("Err gyro_bias");
     println!("gyro_bias {:>7.3} {:>7.3} {:>7.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
+    println!("gyro_resolution {:>15.10}", mpu9250.gyro_resolution());
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
@@ -100,6 +103,10 @@ fn main() -> io::Result<()> {
     let g = 9.806;
     let mut t: usize = 0;
     loop {
+        thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
+
+        while
+
         let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
 
         // Obtain sensor values from a source
@@ -156,6 +163,5 @@ fn main() -> io::Result<()> {
                vert_pos
         )?;
         stdout.flush()?;
-        thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
     }
 }
