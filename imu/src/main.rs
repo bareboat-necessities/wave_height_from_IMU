@@ -85,7 +85,6 @@ fn main() -> io::Result<()> {
     let mut filtered: KalmanState;
     const SAMPLES: usize = (45.0 / WAIT_SEC) as usize;
     let mut acc_mean = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(0.0);
-    let mut pos_mean = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(0.0);
 
     writeln!(&mut stdout, "Give process a couple of minutes to self calibrate\n")?;
     writeln!(&mut stdout,
@@ -116,16 +115,19 @@ fn main() -> io::Result<()> {
         let g = 9.806;
         let vert_acc_minus_g = rotated_acc[2] - g;
 
-        filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
-        filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
-        predicted = predict_step(&kf, &filtered);
+
 
         let vert_pos = filtered.x[1];
 
         if SAMPLES <= t && t <= (2 * SAMPLES) {
             acc_mean.add_sample(vert_acc_minus_g);
-            pos_mean.add_sample(vert_pos);
             t = t + 1;
+        }
+
+        if t >= (2 * SAMPLES) {
+            filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
+            filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
+            predicted = predict_step(&kf, &filtered);
         }
 
         write!(&mut stdout,
