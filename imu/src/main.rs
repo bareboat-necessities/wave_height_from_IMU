@@ -2,6 +2,7 @@
 
 extern crate linux_embedded_hal as hal;
 extern crate mpu9250;
+extern crate simple_moving_average as sma;
 
 #[macro_use]
 extern crate rulinalg;
@@ -22,6 +23,8 @@ use std::f64;
 use rulinalg::vector::Vector;
 use linearkalman::{KalmanFilter, KalmanState, update_step, predict_step};
 
+use sma::{SingleSumSMA, SMA};
+
 fn main() -> io::Result<()> {
     let i2c = I2cdev::new("/dev/i2c-1").expect("unable to open /dev/i2c-1");
 
@@ -37,10 +40,10 @@ fn main() -> io::Result<()> {
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
-    let wait_sec = 0.02;
+    const WAIT_SEC: f64 = 0.02;
 
     let mut ahrs = Madgwick::new_with_quat(
-        wait_sec,
+        WAIT_SEC,
         0.1f64,
         UnitQuaternion::new_unchecked(Quaternion::new(
             nalgebra::one(),
@@ -49,11 +52,10 @@ fn main() -> io::Result<()> {
             nalgebra::zero(),
         )));
 
-
     let pos_integral_trans_variance: f64 = 100.0;
     let pos_integral_variance: f64 = 100.0;
 
-    let dt = wait_sec;
+    let dt = WAIT_SEC;
     let b = Vector::new(vec![((1.0 / 6.0) * dt.powi(3)), (0.5 * dt.powi(2)), dt]);
 
     let x0 = vector![0.0, 0.0, 0.0];
@@ -81,6 +83,8 @@ fn main() -> io::Result<()> {
 
     let mut predicted: KalmanState = KalmanState { x: (kf.x0).clone(), p: (kf.p0).clone() };
     let mut filtered: KalmanState;
+    const SAMPLES: usize = (45.0 / WAIT_SEC) as usize;
+    let mut acc_mean = SingleSumSMA::<f64, f64, SAMPLES>::from_zero(0.0);
 
     writeln!(&mut stdout,
              "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Vert Acc - g (m/s^2) | VPos(m)")?;
@@ -107,9 +111,10 @@ fn main() -> io::Result<()> {
 
         let g = 9.806;
         let vert_acc_minus_g = rotated_acc[2] - g;
+        acc_mean.add_sample(vert_acc_minus_g);
 
         filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
-        filtered.x = &filtered.x + &b * (vert_acc_minus_g - 0.0/*acc_mean*/);
+        filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
         predicted = predict_step(&kf, &filtered);
 
         let vert_pos = filtered.x[1];
@@ -133,6 +138,6 @@ fn main() -> io::Result<()> {
                vert_pos
         )?;
         stdout.flush()?;
-        thread::sleep(Duration::from_micros((wait_sec * 1000000.0) as u64));
+        thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
     }
 }
