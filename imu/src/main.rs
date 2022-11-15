@@ -115,9 +115,9 @@ fn main() -> io::Result<()> {
         let g = 9.806;
         let vert_acc_minus_g = rotated_acc[2] - g;
 
+        t = t + 1;
         if SAMPLES <= t && t <= (2 * SAMPLES) {
             acc_mean.add_sample(vert_acc_minus_g);
-            t = t + 1;
         }
 
         let mut vert_pos = 0.0;
@@ -126,10 +126,11 @@ fn main() -> io::Result<()> {
             filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
             predicted = predict_step(&kf, &filtered);
             vert_pos = filtered.x[1];
+            t = 2 * SAMPLES
         }
 
         write!(&mut stdout,
-               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>6.2}",
+               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.3}",
                all.accel[0],
                all.accel[1],
                all.accel[2],
