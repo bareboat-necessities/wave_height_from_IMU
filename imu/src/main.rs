@@ -45,7 +45,7 @@ fn main() -> io::Result<()> {
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
-    const WAIT_SEC: f64 = 0.02;
+    const WAIT_SEC: f64 = 0.1;
 
     let mut ahrs = Madgwick::new_with_quat(
         WAIT_SEC,
