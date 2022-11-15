@@ -145,7 +145,7 @@ fn main() -> io::Result<()> {
                pitch * 180.0 / f64::consts::PI,
                yaw * 180.0 / f64::consts::PI,
                vert_acc_minus_g,
-               vert_pos
+               acc_mean.get_average()
         )?;
         stdout.flush()?;
         thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
