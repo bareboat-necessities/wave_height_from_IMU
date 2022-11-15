@@ -115,17 +115,17 @@ fn main() -> io::Result<()> {
         let g = 9.806;
         let vert_acc_minus_g = rotated_acc[2] - g;
 
-        let vert_pos = filtered.x[1];
-
         if SAMPLES <= t && t <= (2 * SAMPLES) {
             acc_mean.add_sample(vert_acc_minus_g);
             t = t + 1;
         }
 
+        let mut vert_pos = 0.0;
         if t >= (2 * SAMPLES) {
             filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
             filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
             predicted = predict_step(&kf, &filtered);
+            vert_pos = filtered.x[1];
         }
 
         write!(&mut stdout,
