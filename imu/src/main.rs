@@ -53,6 +53,7 @@ fn main() -> io::Result<()> {
     let pos_integral_trans_variance: f64 = 100.0;
     let pos_integral_variance: f64 = 100.0;
 
+    let dt = wait_sec;
     let b = Vector::new(vec![((1.0 / 6.0) * dt.powi(3)), (0.5 * dt.powi(2)), dt]);
 
     let x0 = vector![0.0, 0.0, 0.0];
