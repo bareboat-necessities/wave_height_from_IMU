@@ -43,7 +43,7 @@ fn main() -> io::Result<()> {
     const WAIT_SEC: f64 = 0.02;
 
     let mut ahrs = Madgwick::new_with_quat(
-        WAIT_SEC * 200.0,
+        WAIT_SEC,
         0.1f64,
         UnitQuaternion::new_unchecked(Quaternion::new(
             nalgebra::one(),
