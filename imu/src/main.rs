@@ -14,11 +14,11 @@ use std::time::Duration;
 
 use hal::Delay;
 use hal::I2cdev;
-use mpu9250::{Mpu9250, DmpMeasurement/*, MargMeasurements*/};
+use mpu9250::{Mpu9250, MargMeasurements};
 
 use ahrs::{Ahrs, Madgwick};
 use nalgebra::{Vector3, Quaternion, UnitQuaternion};
-use std::{f64, u8};
+use std::f64;
 
 use rulinalg::vector::Vector;
 use linearkalman::{KalmanFilter, KalmanState, update_step, predict_step};
@@ -29,27 +29,28 @@ fn main() -> io::Result<()> {
     let i2c = I2cdev::new("/dev/i2c-1").expect("unable to open /dev/i2c-1");
 
     let mut mpu9250 =
-        Mpu9250::dmp_default(i2c, &mut Delay, firmware: &[u8]).expect("unable to make MPU9250");
+        Mpu9250::marg_default(i2c, &mut Delay).expect("unable to make MPU9250");
 
     let who_am_i = mpu9250.who_am_i().expect("could not read WHO_AM_I");
-    //let mag_who_am_i = mpu9250.ak8963_who_am_i().expect("could not read magnetometer's WHO_AM_I");
+    let mag_who_am_i = mpu9250.ak8963_who_am_i()
+        .expect("could not read magnetometer's WHO_AM_I");
     println!("WHO_AM_I: 0x{:x}", who_am_i);
-    //println!("AK8963 WHO_AM_I: 0x{:x}", mag_who_am_i);
+    println!("AK8963 WHO_AM_I: 0x{:x}", mag_who_am_i);
     assert_eq!(who_am_i, 0x71);
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
     const WAIT_SEC: f64 = 0.02;
 
-    // let mut ahrs = Madgwick::new_with_quat(
-    //     WAIT_SEC,
-    //     0.1f64,
-    //     UnitQuaternion::new_unchecked(Quaternion::new(
-    //         nalgebra::one(),
-    //         nalgebra::zero(),
-    //         nalgebra::zero(),
-    //         nalgebra::zero(),
-    //     )));
+    let mut ahrs = Madgwick::new_with_quat(
+        WAIT_SEC,
+        0.1f64,
+        UnitQuaternion::new_unchecked(Quaternion::new(
+            nalgebra::one(),
+            nalgebra::zero(),
+            nalgebra::zero(),
+            nalgebra::zero(),
+        )));
 
     let pos_integral_trans_variance: f64 = 1.0;
     let pos_integral_variance: f64 = 1.0;
@@ -94,23 +95,21 @@ fn main() -> io::Result<()> {
     let g = 9.806;
     let mut t: usize = 0;
     loop {
-        //let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
-        let all: DmpMeasurement<[f32; 3], [f64; 4]> = mpu9250.dmp_all().expect("unable to read from MPU!");
+        let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
 
         // Obtain sensor values from a source
-        let gyroscope: Vector3<f64> = Vector3::new(all.gyro.expect("Gyro err")[0] as f64, all.gyro.expect("Gyro err")[1] as f64, all.gyro.expect("Gyro err")[2] as f64);
-        let accelerometer: Vector3<f64> = Vector3::new(all.accel.expect("Acc err")[0] as f64, all.accel.expect("Acc err")[1] as f64, all.accel.expect("Acc err")[2] as f64);
-        //let magnetometer: Vector3<f64> = Vector3::new(all.mag[0] as f64, all.mag[1] as f64, all.mag[2] as f64);
+        let gyroscope: Vector3<f64> = Vector3::new(all.gyro[0] as f64, all.gyro[1] as f64, all.gyro[2] as f64);
+        let accelerometer: Vector3<f64> = Vector3::new(all.accel[0] as f64, all.accel[1] as f64, all.accel[2] as f64);
+        let magnetometer: Vector3<f64> = Vector3::new(all.mag[0] as f64, all.mag[1] as f64, all.mag[2] as f64);
 
         // Run inputs through AHRS filter (gyroscope must be radians/s)
-        // let quat = ahrs
-        //     .update(
-        //         &gyroscope,
-        //         &accelerometer,
-        //         &magnetometer
-        //     )
-        //     .unwrap();
-        let quat = all.quaternion.expect("Can't get quaternion");
+        let quat = ahrs
+            .update(
+                &gyroscope,
+                &accelerometer,
+                &magnetometer
+            )
+            .unwrap();
         let (roll, pitch, yaw) = quat.euler_angles();
 
         let rotated_acc= quat.transform_vector(
@@ -140,9 +139,9 @@ fn main() -> io::Result<()> {
                gyroscope[0],
                gyroscope[1],
                gyroscope[2],
-               0.0/*all.mag[0]*/,
-               0.0/*all.mag[1]*/,
-               0.0/*all.mag[2]*/,
+               magnetometer[0],
+               magnetometer[1],
+               magnetometer[2],
                all.temp,
                roll * 180.0 / f64::consts::PI,
                pitch * 180.0 / f64::consts::PI,
