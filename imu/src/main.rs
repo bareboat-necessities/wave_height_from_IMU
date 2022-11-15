@@ -115,8 +115,6 @@ fn main() -> io::Result<()> {
         let g = 9.806;
         let vert_acc_minus_g = rotated_acc[2] - g;
 
-
-
         let vert_pos = filtered.x[1];
 
         if SAMPLES <= t && t <= (2 * SAMPLES) {
