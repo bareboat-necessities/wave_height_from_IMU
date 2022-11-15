@@ -38,9 +38,9 @@ fn main() -> io::Result<()> {
     println!("AK8963 WHO_AM_I: 0x{:x}", mag_who_am_i);
     assert_eq!(who_am_i, 0x71);
 
-    let acc_bias = mpu9250.get_accel_bias().expect("Err accel_bias");
+    let acc_bias: [f32; 3] = mpu9250.get_accel_bias().expect("Err accel_bias");
     println!("accel_bias {:>7.3} {:>7.3} {:>7.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
-    let gyro_bias = mpu9250.get_gyro_bias().expect("Err gyro_bias");
+    let gyro_bias: [f32; 3] = mpu9250.get_gyro_bias().expect("Err gyro_bias");
     println!("gyro_bias {:>7.3} {:>7.3} {:>7.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
 
     let stdout = io::stdout();
