@@ -98,8 +98,8 @@ fn main() -> io::Result<()> {
         let all: DmpMeasurement<[f32; 3], [f64; 4]> = mpu9250.dmp_all().expect("unable to read from MPU!");
 
         // Obtain sensor values from a source
-        let gyroscope: Vector3<f64> = Vector3::new(all.gyro.expect("Gyro err").0 as f64, all.gyro.expect("Gyro err").1 as f64, all.gyro.expect("Gyro err").2 as f64);
-        let accelerometer: Vector3<f64> = Vector3::new(all.accel.expect("Acc err").0 as f64, all.accel.expect("Acc err").1 as f64, all.accel.expect("Acc err").2 as f64);
+        let gyroscope: Vector3<f64> = Vector3::new(all.gyro.expect("Gyro err")[0] as f64, all.gyro.expect("Gyro err")[1] as f64, all.gyro.expect("Gyro err")[2] as f64);
+        let accelerometer: Vector3<f64> = Vector3::new(all.accel.expect("Acc err")[0] as f64, all.accel.expect("Acc err")[1] as f64, all.accel.expect("Acc err")[2] as f64);
         //let magnetometer: Vector3<f64> = Vector3::new(all.mag[0] as f64, all.mag[1] as f64, all.mag[2] as f64);
 
         // Run inputs through AHRS filter (gyroscope must be radians/s)
