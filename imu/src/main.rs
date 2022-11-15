@@ -88,9 +88,10 @@ fn main() -> io::Result<()> {
 
     writeln!(&mut stdout, "Give process a couple of minutes to self calibrate\n")?;
     writeln!(&mut stdout,
-             "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Vert Acc - g (m/s^2) | VPos(m)")?;
+             "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Vert Acc - g (m/s^2) | VVel(m/s) | VPos(m)")?;
 
     let mut vert_pos = 0.0;
+    let mut vert_vel = 0.0;
     let g = 9.806;
     let mut t: usize = 0;
     loop {
@@ -126,11 +127,12 @@ fn main() -> io::Result<()> {
             filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
             predicted = predict_step(&kf, &filtered);
             vert_pos = filtered.x[1];
+            vert_vel = filtered.x[2];
             t = 2 * SAMPLES
         }
 
         write!(&mut stdout,
-               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.3}",
+               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.2}   | {:>7.3}",
                all.accel[0],
                all.accel[1],
                all.accel[2],
@@ -145,7 +147,8 @@ fn main() -> io::Result<()> {
                pitch * 180.0 / f64::consts::PI,
                yaw * 180.0 / f64::consts::PI,
                vert_acc_minus_g,
-               acc_mean.get_average()
+               vert_vel,
+               vert_pos
         )?;
         stdout.flush()?;
         thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
