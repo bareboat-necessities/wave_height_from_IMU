@@ -86,6 +86,7 @@ fn main() -> io::Result<()> {
     const SAMPLES: usize = (45.0 / WAIT_SEC) as usize;
     let mut acc_mean = SingleSumSMA::<f64, f64, SAMPLES>::from_zero(0.0);
 
+    writeln!(&mut stdout, "Give process a min to self calibrate\n")?;
     writeln!(&mut stdout,
              "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Vert Acc - g (m/s^2) | VPos(m)")?;
     loop {
@@ -120,7 +121,7 @@ fn main() -> io::Result<()> {
         let vert_pos = filtered.x[1];
 
         write!(&mut stdout,
-               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>6.2} | {:>6.2}",
+               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>6.2}              | {:>6.2}",
                all.accel[0],
                all.accel[1],
                all.accel[2],
