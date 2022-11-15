@@ -38,6 +38,9 @@ fn main() -> io::Result<()> {
     println!("AK8963 WHO_AM_I: 0x{:x}", mag_who_am_i);
     assert_eq!(who_am_i, 0x71);
 
+    println!("accel_bias {:>7.3}", mpu9250.get_accel_bias());
+    println!("gyro_bias {:>7.3}", mpu9250.get_gyro_bias());
+
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
     const WAIT_SEC: f64 = 0.02;
