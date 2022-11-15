@@ -105,8 +105,6 @@ fn main() -> io::Result<()> {
     loop {
         thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
 
-        while
-
         let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
 
         // Obtain sensor values from a source
