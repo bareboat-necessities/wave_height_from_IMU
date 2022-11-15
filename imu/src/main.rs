@@ -89,6 +89,8 @@ fn main() -> io::Result<()> {
     writeln!(&mut stdout, "Give process a min to self calibrate\n")?;
     writeln!(&mut stdout,
              "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Vert Acc - g (m/s^2) | VPos(m)")?;
+
+    let mut t: usize = 0;
     loop {
         let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
 
@@ -112,11 +114,10 @@ fn main() -> io::Result<()> {
 
         let g = 9.806;
         let vert_acc_minus_g = rotated_acc[2] - g;
-        let mut t: usize = 0;
         if t <= SAMPLES {
             acc_mean.add_sample(vert_acc_minus_g);
         }
-        t = &t + 1;
+        t = t + 1;
 
         filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
         filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
