@@ -115,8 +115,9 @@ fn main() -> io::Result<()> {
     let mut acc_mean: f64 = 0.0;
 
     loop {
+        let mut ta = Instant::now();
         loop {
-            let mut t = Instant::now();
+            let t = Instant::now();
             match mpu9250.all::<[f32; 3]>() {
                 Ok(all ) => {
                     // Obtain sensor values from a source
@@ -141,8 +142,9 @@ fn main() -> io::Result<()> {
                     acc_mean_filter.add_sample(vert_acc_minus_g);
                     acc_mean =  acc_mean_filter.get_average();
 
-                    if period_expired(t.elapsed(), ACC_SAMPLE_PERIOD_SEC) {
+                    if period_expired(ta.elapsed(), ACC_SAMPLE_PERIOD_SEC) {
                         k = k + 1;
+                        ta = Instant::now();
 
                         filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
                         filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean);
