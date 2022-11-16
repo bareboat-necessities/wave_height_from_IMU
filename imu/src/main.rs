@@ -58,6 +58,7 @@ fn main() -> io::Result<()> {
     const WAIT_SEC: f64 = 0.1;
 
     const IMU_SAMPLE_SEC: f64 = 0.02;
+    const ACC_AVG_PERIOD_SEC: f64 = 45.0;
 
     let mut ahrs = Madgwick::new_with_quat(
         IMU_SAMPLE_SEC,
@@ -107,9 +108,10 @@ fn main() -> io::Result<()> {
     let mut vert_vel = 0.0;
     let g = 9.81;
     let mut t: usize = 0;
-    loop {
-        thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
 
+    let mut acc_avg_time = Instant::now();
+    let mut acc_mean: f64 = 0.0;
+    loop {
         loop {
             let mut t = Instant::now();
             match mpu9250.all::<[f32; 3]>() {
@@ -132,7 +134,12 @@ fn main() -> io::Result<()> {
                     let rotated_acc = quat.transform_vector(
                         &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
 
-                    let vert_acc_minus_g = rotated_acc[2] - g;
+                    let vert_acc_minus_g = rotated_acc[2] - &g;
+                    if acc_avg_time.elapsed().saturating_sub(Duration::from_micros((ACC_AVG_PERIOD_SEC * 1000000.0) as u64)) != Duration::ZERO {
+                        acc_mean =  acc_mean.get_average();
+                        acc_avg_time = Instant::now();
+                    }
+                    acc_mean.add_sample(vert_acc_minus_g);
 
                     /*
                     t = t + 1;
@@ -142,7 +149,7 @@ fn main() -> io::Result<()> {
 
                     if t >= (2 * SAMPLES) {
                         filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
-                        filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
+                        filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean);
                         predicted = predict_step(&kf, &filtered);
                         vert_pos = filtered.x[1];
                         vert_vel = filtered.x[2];
@@ -156,11 +163,13 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "roll/pitch/yaw  (deg) | {:>8.1} {:>8.1} {:>8.1}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
                     write!(&mut stdout, "temp              (C) | {:>8.2}\n", all.temp)?;
                     write!(&mut stdout, "accel ref xyz (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", rotated_acc[0], rotated_acc[1], rotated_acc[2])?;
+                    write!(&mut stdout, "acc_z/avg     (m/s^2) | {:>8.3} {:>8.3}\n", vert_acc_minus_g, acc_mean)?;
                     write!(&mut stdout, "uptime       (millis) | {:>8?}                 \n", start.elapsed().as_millis())?;
                     write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
                     stdout.flush()?;
-                    write!(&mut stdout, "{}", move_up_csi_sequence(8))?;
+                    write!(&mut stdout, "{}", move_up_csi_sequence(9))?;
 
+                    // TODO: Panics!!!
                     thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64)
                         .checked_sub(t.elapsed()).expect("Err time subtract"));
                 }
