@@ -52,13 +52,14 @@ fn main() -> io::Result<()> {
     let mag_sens_adj: [f32; 3] = mpu9250.mag_sensitivity_adjustments();
     println!("mag sense adj         | {:>8.3} {:>8.3} {:>8.3}", mag_sens_adj[0], mag_sens_adj[1], mag_sens_adj[2]);
 
-    let mut start = Instant::now();
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
-    const WAIT_SEC: f64 = 0.1;
 
     const IMU_SAMPLE_SEC: f64 = 0.02;
+    const ACC_SAMPLE_PERIOD_SEC: f64 = IMU_SAMPLE_SEC * 20;
     const ACC_AVG_PERIOD_SEC: f64 = 45.0;
+    const WARMUP_PERIOD_SEC: f64 = 50.0;
+    const ACC_AVG_SAMPLES: usize = (ACC_AVG_PERIOD_SEC / IMU_SAMPLE_SEC) as usize;
 
     let mut ahrs = Madgwick::new_with_quat(
         IMU_SAMPLE_SEC,
@@ -73,7 +74,7 @@ fn main() -> io::Result<()> {
     let pos_integral_trans_variance: f64 = 1.0;
     let pos_integral_variance: f64 = 1.0;
 
-    let dt = WAIT_SEC;
+    let dt = ACC_SAMPLE_PERIOD_SEC;
     let b = Vector::new(vec![((1.0 / 6.0) * dt.powi(3)), (0.5 * dt.powi(2)), dt]);
 
     let x0 = vector![0.0, 0.0, 0.0];
@@ -101,15 +102,17 @@ fn main() -> io::Result<()> {
 
     let mut predicted: KalmanState = KalmanState { x: (kf.x0).clone(), p: (kf.p0).clone() };
     let mut filtered: KalmanState;
-    const SAMPLES: usize = (45.0 / WAIT_SEC) as usize;
+
+    let g = 9.81;
 
     let mut vert_pos = 0.0;
     let mut vert_vel = 0.0;
-    let g = 9.81;
-    let mut t: usize = 0;
+    let mut k: usize = 0;
+
+    let start = Instant::now();
 
     let mut acc_avg_time = Instant::now();
-    let mut acc_mean_filter = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(0.0);
+    let mut acc_mean_filter = SumTreeSMA::<f64, f64, ACC_AVG_SAMPLES>::from_zero(0.0);
     let mut acc_mean: f64 = 0.0;
 
     loop {
@@ -138,25 +141,21 @@ fn main() -> io::Result<()> {
                     let vert_acc_minus_g = rotated_acc[2] - &g;
                     if period_passed(acc_avg_time.elapsed(), ACC_AVG_PERIOD_SEC) {
                         acc_mean =  acc_mean_filter.get_average();
-                        acc_mean_filter = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(acc_mean / 2.0);
+                        acc_mean_filter = SumTreeSMA::<f64, f64, ACC_AVG_SAMPLES>::from_zero(acc_mean / 2.0);
                         acc_avg_time = Instant::now();
                     }
                     acc_mean_filter.add_sample(vert_acc_minus_g);
 
                     /*
-                    t = t + 1;
-                    if SAMPLES <= t && t <= (2 * SAMPLES) {
-                        acc_mean.add_sample(vert_acc_minus_g);
-                    }
 
-                    if t >= (2 * SAMPLES) {
-                        filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
-                        filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean);
-                        predicted = predict_step(&kf, &filtered);
-                        vert_pos = filtered.x[1];
-                        vert_vel = filtered.x[2];
-                        t = 2 * SAMPLES
-                    }
+                    k = k + 1;
+
+                    filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
+                    filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean);
+                    predicted = predict_step(&kf, &filtered);
+                    vert_pos = filtered.x[1];
+                    vert_vel = filtered.x[2];
+
                      */
 
                     write!(&mut stdout, "accel XYZ     (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", accelerometer[0], accelerometer[1], accelerometer[2])?;
