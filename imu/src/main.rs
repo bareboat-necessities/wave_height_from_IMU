@@ -54,8 +54,10 @@ fn main() -> io::Result<()> {
     let mut stdout = stdout.lock();
     const WAIT_SEC: f64 = 0.1;
 
+    const IMU_SAMPLE_SEC: f64 = 0.001; // for Dlpf::_1
+
     let mut ahrs = Madgwick::new_with_quat(
-        0.001, // for Dlpf::_1
+        0.IMU_SAMPLE_SEC,
         0.1f64,
         UnitQuaternion::new_unchecked(Quaternion::new(
             nalgebra::one(),
@@ -110,6 +112,7 @@ fn main() -> io::Result<()> {
         thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
 
         loop {
+            let mut t = Instant::now();
             match mpu9250.all::<[f32; 3]>() {
                 Ok(all ) => {
                     // Obtain sensor values from a source
@@ -148,8 +151,6 @@ fn main() -> io::Result<()> {
                     }
                      */
 
-                    //let mut t = Instant::now();
-
                     write!(&mut stdout,
                            "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.2}   | {:>7.3}",
                            //t.elapsed(),
@@ -171,6 +172,9 @@ fn main() -> io::Result<()> {
                            vert_pos
                     )?;
                     stdout.flush()?;
+
+                    thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64
+                        - (t.elapsed().as_micros() as u64)));
                 }
                 Err(err) => {
                     println!("{:>?}", err)
