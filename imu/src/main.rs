@@ -57,7 +57,7 @@ fn main() -> io::Result<()> {
     const IMU_SAMPLE_SEC: f64 = 0.001; // for Dlpf::_1
 
     let mut ahrs = Madgwick::new_with_quat(
-        0.IMU_SAMPLE_SEC,
+        IMU_SAMPLE_SEC,
         0.1f64,
         UnitQuaternion::new_unchecked(Quaternion::new(
             nalgebra::one(),
