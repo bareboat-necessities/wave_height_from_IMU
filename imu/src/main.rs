@@ -42,13 +42,13 @@ fn main() -> io::Result<()> {
 
     mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_2)).expect("Err setting rate");
 
-    println!("accel_resolution      | {:>8.5}", mpu9250.accel_resolution());
-    println!("gyro_resolution       | {:>8.5}", mpu9250.gyro_resolution());
-    println!("mag_resolution        | {:>8.5}", mpu9250.mag_resolution());
+    println!("accel resolution      | {:>8.5}", mpu9250.accel_resolution());
+    println!("gyro resolution       | {:>8.5}", mpu9250.gyro_resolution());
+    println!("mag resolution        | {:>8.5}", mpu9250.mag_resolution());
     let acc_bias: [f32; 3] = mpu9250.get_accel_bias().expect("Err accel_bias");
-    println!("accel_bias            | {:>8.3} {:>8.3} {:>8.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
+    println!("accel bias            | {:>8.3} {:>8.3} {:>8.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
     let gyro_bias: [f32; 3] = mpu9250.get_gyro_bias().expect("Err gyro_bias");
-    println!("gyro_bias             | {:>8.3} {:>8.3} {:>8.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
+    println!("gyro bias             | {:>8.3} {:>8.3} {:>8.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
     let mag_sens_adj: [f32; 3] = mpu9250.mag_sensitivity_adjustments();
     println!("mag sense adj         | {:>8.3} {:>8.3} {:>8.3}", mag_sens_adj[0], mag_sens_adj[1], mag_sens_adj[2]);
 
