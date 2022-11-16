@@ -56,7 +56,7 @@ fn main() -> io::Result<()> {
     let mut stdout = stdout.lock();
 
     const IMU_SAMPLE_SEC: f64 = 0.02;
-    const ACC_SAMPLE_PERIOD_SEC: f64 = IMU_SAMPLE_SEC * 20;
+    const ACC_SAMPLE_PERIOD_SEC: f64 = IMU_SAMPLE_SEC * 20.0;
     const ACC_AVG_PERIOD_SEC: f64 = 45.0;
     const WARMUP_PERIOD_SEC: f64 = 50.0;
     const ACC_AVG_SAMPLES: usize = (ACC_AVG_PERIOD_SEC / IMU_SAMPLE_SEC) as usize;
