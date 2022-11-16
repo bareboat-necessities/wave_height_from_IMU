@@ -142,7 +142,8 @@ fn main() -> io::Result<()> {
                     acc_mean_filter.add_sample(vert_acc_minus_g);
                     acc_mean =  acc_mean_filter.get_average();
 
-                    if period_expired(ta.elapsed(), ACC_SAMPLE_PERIOD_SEC) {
+                    if period_expired(ta.elapsed(), ACC_SAMPLE_PERIOD_SEC)
+                        && period_expired(start.elapsed(), WARMUP_PERIOD_SEC) {
                         k = k + 1;
                         ta = Instant::now();
 
