@@ -163,10 +163,12 @@ fn main() -> io::Result<()> {
                            vert_vel,
                            vert_pos
                     )?;
+                    stdout.flush()?;
                 }
-
+                Err(err) => {
+                    println!("{:>?}", err)
+                }
             }
         }
-        stdout.flush()?;
     }
 }
