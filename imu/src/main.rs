@@ -71,8 +71,8 @@ fn main() -> io::Result<()> {
             nalgebra::zero(),
         )));
 
-    let pos_integral_trans_variance: f64 = 1.0;
-    let pos_integral_variance: f64 = 1.0;
+    let pos_integral_trans_variance: f64 = 10.0;
+    let pos_integral_variance: f64 = 10.0;
 
     let dt = ACC_SAMPLE_PERIOD_SEC;
     let b = Vector::new(vec![((1.0 / 6.0) * dt.powi(3)), (0.5 * dt.powi(2)), dt]);
@@ -84,8 +84,8 @@ fn main() -> io::Result<()> {
     let kf = KalmanFilter {
         // Process noise covariance
         q: matrix![pos_integral_trans_variance, 0.0, 0.0;
-                                           0.0, 0.1, 0.0;
-                                           0.0, 0.0, 0.05],
+                                           0.0, 0.2, 0.0;
+                                           0.0, 0.0, 0.1],
         // Measurement noise matrix
         r: matrix![pos_integral_variance],
         // Observation matrix
