@@ -147,12 +147,12 @@ fn main() -> io::Result<()> {
                     }
                      */
 
-                    write!(&mut stdout, "accel XYZ (m/s^2)     | {:>8.3} {:>8.3} {:>8.3}\n", accelerometer[0], accelerometer[1], accelerometer[2])?;
-                    write!(&mut stdout, "gyro XYZ (rad/s)      | {:>8.3} {:>8.3} {:>8.3}\n", gyroscope[0], gyroscope[1], gyroscope[2])?;
-                    write!(&mut stdout, "mag field XYZ (uT)    | {:>8.3} {:>8.3} {:>8.3}\n", magnetometer[0], magnetometer[1], magnetometer[2])?;
-                    write!(&mut stdout, "roll/pitch/yaw (deg)  | {:>8.3} {:>8.3} {:>8.3}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
-                    write!(&mut stdout, "temp (C)              | {:>8.3}\n", all.temp)?;
-                    write!(&mut stdout, "time elapsed          | {:?}                   \n", t.elapsed())?;
+                    write!(&mut stdout, "accel XYZ     (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", accelerometer[0], accelerometer[1], accelerometer[2])?;
+                    write!(&mut stdout, "gyro XYZ      (rad/s) | {:>8.2} {:>8.2} {:>8.2}\n", gyroscope[0], gyroscope[1], gyroscope[2])?;
+                    write!(&mut stdout, "mag field XYZ    (uT) | {:>8.2} {:>8.2} {:>8.2}\n", magnetometer[0], magnetometer[1], magnetometer[2])?;
+                    write!(&mut stdout, "roll/pitch/yaw  (deg) | {:>8.1} {:>8.1} {:>8.1}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
+                    write!(&mut stdout, "temp              (C) | {:>8.2}\n", all.temp)?;
+                    write!(&mut stdout, "time elapsed     (ms) | {:?}                   \n", t.elapsed().as_millis())?;
                     stdout.flush()?;
                     write!(&mut stdout, "{}", move_up_csi_sequence(6))?;
 
