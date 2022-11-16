@@ -104,7 +104,7 @@ fn main() -> io::Result<()> {
     let mut vert_vel = 0.0;
     let g = 9.806;
     let mut t: usize = 0;
-    loop {
+    //loop {
         thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
 
         loop {
@@ -145,7 +145,7 @@ fn main() -> io::Result<()> {
                     }
 
                     write!(&mut stdout,
-                           "{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.2}   | {:>7.3}",
+                           "{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.2}   | {:>7.3}\n",
                            accelerometer[0],
                            accelerometer[1],
                            accelerometer[2],
@@ -170,5 +170,5 @@ fn main() -> io::Result<()> {
                 }
             }
         }
-    }
+    //}
 }
