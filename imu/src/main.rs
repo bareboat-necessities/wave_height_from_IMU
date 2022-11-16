@@ -10,7 +10,7 @@ extern crate linearkalman;
 
 use std::io::{self, Write};
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 
 use hal::Delay;
 use hal::I2cdev;
@@ -155,7 +155,7 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "roll/pitch/yaw  (deg) | {:>8.1} {:>8.1} {:>8.1}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
                     write!(&mut stdout, "temp              (C) | {:>8.2}\n", all.temp)?;
                     write!(&mut stdout, "accel ref xyz (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", rotated_acc[0], rotated_acc[1], rotated_acc[2])?;
-                    write!(&mut stdout, "time now     (micros) | {:>8?}                 \n", Instant::now().as_micros())?;
+                    write!(&mut stdout, "time now     (micros) | {:>8?}                 \n", SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).expect("Time in past?").as_millis())?;
                     write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
                     stdout.flush()?;
                     write!(&mut stdout, "{}", move_up_csi_sequence(8))?;
