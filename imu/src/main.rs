@@ -1,5 +1,7 @@
 //! Raspberry Pi4 demo
 
+// TODO: fix reading IMU, etc. Not working example!!!
+
 extern crate linux_embedded_hal as hal;
 extern crate mpu9250;
 extern crate simple_moving_average as sma;
@@ -190,10 +192,6 @@ macro_rules! csi {
 
 fn move_up_csi_sequence(count: u16) -> String {
     format!(csi!("{}A"), count)
-}
-
-fn move_down_csi_sequence(count: u16) -> String {
-    format!(csi!("{}B"), count)
 }
 
 fn period_expired(time: Duration, period_sec: f64) -> bool {
