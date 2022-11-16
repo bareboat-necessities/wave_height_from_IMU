@@ -136,7 +136,7 @@ fn main() -> io::Result<()> {
                         &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
 
                     let vert_acc_minus_g = rotated_acc[2] - &g;
-                    if acc_avg_time.elapsed().saturating_sub(Duration::from_micros((ACC_AVG_PERIOD_SEC * 1000000.0) as u64)) != Duration::ZERO {
+                    if period_passed(acc_avg_time.elapsed(), ACC_AVG_PERIOD_SEC) {
                         acc_mean =  acc_mean_filter.get_average();
                         acc_mean_filter = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(acc_mean / 2.0);
                         acc_avg_time = Instant::now();
@@ -193,4 +193,8 @@ fn move_up_csi_sequence(count: u16) -> String {
 
 fn move_down_csi_sequence(count: u16) -> String {
     format!(csi!("{}B"), count)
+}
+
+fn period_passed(time: Duration, period_sec: f64) -> bool {
+    time.saturating_sub(Duration::from_micros((period_sec * 1000000.0) as u64)) != Duration::ZERO
 }
