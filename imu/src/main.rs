@@ -116,7 +116,7 @@ fn main() -> io::Result<()> {
 
     loop {
         loop {
-            let t = Instant::now();
+            let mut t = Instant::now();
             match mpu9250.all::<[f32; 3]>() {
                 Ok(all ) => {
                     // Obtain sensor values from a source
