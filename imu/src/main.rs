@@ -167,7 +167,7 @@ fn main() -> io::Result<()> {
                            roll * 180.0 / f64::consts::PI,
                            pitch * 180.0 / f64::consts::PI,
                            yaw * 180.0 / f64::consts::PI,
-                           vert_acc_minus_g - acc_mean.get_average(),
+                           vert_acc_minus_g,
                            vert_vel,
                            vert_pos
                     )?;
