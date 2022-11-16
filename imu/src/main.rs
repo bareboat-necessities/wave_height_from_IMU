@@ -135,6 +135,8 @@ fn main() -> io::Result<()> {
                         .unwrap();
                     let (roll, pitch, yaw) = quat.euler_angles();
 
+                    let acc_abs = Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64).magnitude()
+
                     let rotated_acc = quat.transform_vector(
                         &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
 
@@ -161,13 +163,14 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "roll/pitch/yaw  (deg) | {:>8.1} {:>8.1} {:>8.1}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
                     write!(&mut stdout, "temp              (C) | {:>8.2}\n", all.temp)?;
                     write!(&mut stdout, "accel ref xyz (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", rotated_acc[0], rotated_acc[1], rotated_acc[2])?;
+                    write!(&mut stdout, "acc_abs      (m/s^2)  | {:>8.3} \n", acc_abs)?;
                     write!(&mut stdout, "acc_z/avg     (m/s^2) | {:>8.3} {:>8.3}\n", vert_acc_minus_g - acc_mean, acc_mean)?;
                     write!(&mut stdout, "vert_vel       (m/s)  | {:>8.3} \n", vert_vel)?;
                     write!(&mut stdout, "vert_pos         (m)  | {:>8.3} \n", vert_pos)?;
                     write!(&mut stdout, "uptime       (millis) | {:>8?}                 \n", start.elapsed().as_millis())?;
                     write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
                     stdout.flush()?;
-                    write!(&mut stdout, "{}", move_up_csi_sequence(11))?;
+                    write!(&mut stdout, "{}", move_up_csi_sequence(12))?;
 
                     // TODO: Panics!!!
                     thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64)
