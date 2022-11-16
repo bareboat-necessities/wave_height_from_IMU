@@ -116,7 +116,7 @@ fn main() -> io::Result<()> {
 
     loop {
         loop {
-            let mut t = Instant::now();
+            let t = Instant::now();
             match mpu9250.all::<[f32; 3]>() {
                 Ok(all ) => {
                     // Obtain sensor values from a source
@@ -141,17 +141,15 @@ fn main() -> io::Result<()> {
                     acc_mean_filter.add_sample(vert_acc_minus_g);
                     acc_mean =  acc_mean_filter.get_average();
 
-                    /*
+                    if period_expired(t.elapsed(), ACC_SAMPLE_PERIOD_SEC) {
+                        k = k + 1;
 
-                    k = k + 1;
-
-                    filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
-                    filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean);
-                    predicted = predict_step(&kf, &filtered);
-                    vert_pos = filtered.x[1];
-                    vert_vel = filtered.x[2];
-
-                     */
+                        filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
+                        filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean);
+                        predicted = predict_step(&kf, &filtered);
+                        vert_pos = filtered.x[1];
+                        vert_vel = filtered.x[2];
+                    }
 
                     write!(&mut stdout, "accel XYZ     (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", accelerometer[0], accelerometer[1], accelerometer[2])?;
                     write!(&mut stdout, "gyro XYZ      (rad/s) | {:>8.2} {:>8.2} {:>8.2}\n", gyroscope[0], gyroscope[1], gyroscope[2])?;
@@ -160,10 +158,12 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "temp              (C) | {:>8.2}\n", all.temp)?;
                     write!(&mut stdout, "accel ref xyz (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", rotated_acc[0], rotated_acc[1], rotated_acc[2])?;
                     write!(&mut stdout, "acc_z/avg     (m/s^2) | {:>8.3} {:>8.3}\n", vert_acc_minus_g - acc_mean, acc_mean)?;
+                    write!(&mut stdout, "vert_vel       (m/s)  | {:>8.3} \n", vert_vel)?;
+                    write!(&mut stdout, "vert_pos         (m)  | {:>8.3} \n", vert_pos)?;
                     write!(&mut stdout, "uptime       (millis) | {:>8?}                 \n", start.elapsed().as_millis())?;
                     write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
                     stdout.flush()?;
-                    write!(&mut stdout, "{}", move_up_csi_sequence(9))?;
+                    write!(&mut stdout, "{}", move_up_csi_sequence(11))?;
 
                     // TODO: Panics!!!
                     thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64)
@@ -189,6 +189,6 @@ fn move_down_csi_sequence(count: u16) -> String {
     format!(csi!("{}B"), count)
 }
 
-fn period_passed(time: Duration, period_sec: f64) -> bool {
+fn period_expired(time: Duration, period_sec: f64) -> bool {
     time.saturating_sub(Duration::from_micros((period_sec * 1000000.0) as u64)) != Duration::ZERO
 }
