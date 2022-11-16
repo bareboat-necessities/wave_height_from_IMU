@@ -1,4 +1,4 @@
-//! Raspberry Pi demo
+//! Raspberry Pi4 demo
 
 extern crate linux_embedded_hal as hal;
 extern crate mpu9250;
