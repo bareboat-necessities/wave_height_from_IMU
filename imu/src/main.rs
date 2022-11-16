@@ -49,8 +49,8 @@ fn main() -> io::Result<()> {
     println!("accel_bias            | {:>8.3} {:>8.3} {:>8.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
     let gyro_bias: [f32; 3] = mpu9250.get_gyro_bias().expect("Err gyro_bias");
     println!("gyro_bias             | {:>8.3} {:>8.3} {:>8.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
-    let mag_sensitivity_adjustments: [f32; 3] = mpu9250.mag_sensitivity_adjustments().expect("Err mag adj");
-    println!("mag sense adj         | {:>8.3} {:>8.3} {:>8.3}", mag_sensitivity_adjustments[0], mag_sensitivity_adjustments[1], mag_sensitivity_adjustments[2]);
+    let mag_sens_adj: [f32; 3] = mpu9250.mag_sensitivity_adjustments::<[f32; 3]>().expect("Err mag adj");
+    println!("mag sense adj         | {:>8.3} {:>8.3} {:>8.3}", mag_sens_adj[0], mag_sens_adj[1], mag_sens_adj[2]);
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
