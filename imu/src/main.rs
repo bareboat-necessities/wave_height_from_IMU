@@ -40,7 +40,7 @@ fn main() -> io::Result<()> {
     println!("AK8963 WHO_AM_I       |     0x{:x}", mag_who_am_i);
     assert_eq!(who_am_i, 0x71);
 
-    mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_3)).expect("Err setting rate");
+    mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_1)).expect("Err setting rate");
 
     println!("accel_resolution      | {:>8.5}", mpu9250.accel_resolution());
     println!("gyro_resolution       | {:>8.5}", mpu9250.gyro_resolution());
@@ -53,7 +53,7 @@ fn main() -> io::Result<()> {
     let mut stdout = stdout.lock();
     const WAIT_SEC: f64 = 0.1;
 
-    const IMU_SAMPLE_SEC: f64 = 0.02;
+    const IMU_SAMPLE_SEC: f64 = 0.01;
 
     let mut ahrs = Madgwick::new_with_quat(
         IMU_SAMPLE_SEC,
