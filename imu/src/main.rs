@@ -156,8 +156,9 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "temp              (C) | {:>8.2}\n", all.temp)?;
                     write!(&mut stdout, "accel ref xyz (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", rotated_acc[0], rotated_acc[1], rotated_acc[2])?;
                     write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
+                    write!(&mut stdout, "time now     (micros) | {:>8?}                 \n", Instant::now().as_micros())?;
                     stdout.flush()?;
-                    write!(&mut stdout, "{}", move_up_csi_sequence(7))?;
+                    write!(&mut stdout, "{}", move_up_csi_sequence(8))?;
 
                     thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64)
                         .checked_sub(t.elapsed()).expect("Err time subtract"));
