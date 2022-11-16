@@ -152,7 +152,7 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "mag field XYZ (uT)    | {:>7.3} {:>7.3} {:>7.3}\n", magnetometer[0], magnetometer[1], magnetometer[2])?;
                     write!(&mut stdout, "roll/pitch/yaw (deg)  | {:>7.3} {:>7.3} {:>7.3}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
                     write!(&mut stdout, "temp (C)              | {:>7.3}\n", all.temp)?;
-                    write!(&mut stdout, "\r\r\r\r\r")?;
+                    write!(&mut stdout, "\033[H\033[H\033[H\033[H\033[H")?;
                     stdout.flush()?;
 
                     thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64));
