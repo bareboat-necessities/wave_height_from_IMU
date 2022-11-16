@@ -46,6 +46,6 @@ while True:
                                      math.degrees(fusionPose[2]),
                                      accel[0],
                                      accel[1],
-                                     accel[2]))
+                                     accel[2]), end=" ")
         time.sleep(poll_interval*1.0/1000.0)
 
