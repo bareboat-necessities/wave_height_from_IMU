@@ -18,7 +18,7 @@ use mpu9250::{Mpu9250, MargMeasurements, AccelDataRate, Dlpf};
 
 use ahrs::{Ahrs, Madgwick};
 use nalgebra::{Vector3, Quaternion, UnitQuaternion};
-use std::f64;
+use std::{f64, Instant};
 
 use rulinalg::vector::Vector;
 use linearkalman::{KalmanFilter, KalmanState, update_step, predict_step};
@@ -42,7 +42,7 @@ fn main() -> io::Result<()> {
     println!("accel_bias {:>7.3} {:>7.3} {:>7.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
     println!("accel_resolution {:>15.10}", mpu9250.accel_resolution());
 
-    mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_0)).expect("Err setting rate");
+    mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_1)).expect("Err setting rate");
 
     let gyro_bias: [f32; 3] = mpu9250.get_gyro_bias().expect("Err gyro_bias");
     println!("gyro_bias {:>7.3} {:>7.3} {:>7.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
@@ -53,7 +53,7 @@ fn main() -> io::Result<()> {
     const WAIT_SEC: f64 = 0.1;
 
     let mut ahrs = Madgwick::new_with_quat(
-        WAIT_SEC,
+        0.001, // for Dlpf::_1
         0.1f64,
         UnitQuaternion::new_unchecked(Quaternion::new(
             nalgebra::one(),
@@ -104,7 +104,7 @@ fn main() -> io::Result<()> {
     let mut vert_vel = 0.0;
     let g = 9.806;
     let mut t: usize = 0;
-    //loop {
+    loop {
         thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
 
         loop {
@@ -130,6 +130,7 @@ fn main() -> io::Result<()> {
 
                     let vert_acc_minus_g = rotated_acc[2] - g;
 
+                    /*
                     t = t + 1;
                     if SAMPLES <= t && t <= (2 * SAMPLES) {
                         acc_mean.add_sample(vert_acc_minus_g);
@@ -143,9 +144,13 @@ fn main() -> io::Result<()> {
                         vert_vel = filtered.x[2];
                         t = 2 * SAMPLES
                     }
+                     */
+
+                    let mut t = Instant::now();
 
                     write!(&mut stdout,
-                           "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.2}   | {:>7.3}",
+                           "\r{:?}{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.2}   | {:>7.3}",
+                           t.elapsed(),
                            accelerometer[0],
                            accelerometer[1],
                            accelerometer[2],
@@ -170,5 +175,5 @@ fn main() -> io::Result<()> {
                 }
             }
         }
-    //}
+    }
 }
