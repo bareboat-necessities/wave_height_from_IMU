@@ -44,7 +44,7 @@ fn main() -> io::Result<()> {
     println!("accel_bias {:>7.3} {:>7.3} {:>7.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
     println!("accel_resolution {:>15.10}", mpu9250.accel_resolution());
 
-    mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_1)).expect("Err setting rate");
+    mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_3)).expect("Err setting rate");
 
     let gyro_bias: [f32; 3] = mpu9250.get_gyro_bias().expect("Err gyro_bias");
     println!("gyro_bias {:>7.3} {:>7.3} {:>7.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
@@ -54,7 +54,7 @@ fn main() -> io::Result<()> {
     let mut stdout = stdout.lock();
     const WAIT_SEC: f64 = 0.1;
 
-    const IMU_SAMPLE_SEC: f64 = 0.001; // for Dlpf::_1
+    const IMU_SAMPLE_SEC: f64 = 0.02;
 
     let mut ahrs = Madgwick::new_with_quat(
         IMU_SAMPLE_SEC,
@@ -156,8 +156,8 @@ fn main() -> io::Result<()> {
                     stdout.flush()?;
                     write!(&mut stdout, "{}", move_up_csi_sequence(6))?;
 
-                    thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64));
-                    //    .checked_sub(t.elapsed()).expect("Err time subtract"));
+                    thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64)
+                        .checked_sub(t.elapsed()).expect("Err time subtract"));
                 }
                 Err(err) => {
                     println!("{:>?}", err)
