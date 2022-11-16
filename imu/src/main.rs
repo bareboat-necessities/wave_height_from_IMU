@@ -111,7 +111,6 @@ fn main() -> io::Result<()> {
 
     let start = Instant::now();
 
-    let mut acc_avg_time = Instant::now();
     let mut acc_mean_filter = SumTreeSMA::<f64, f64, ACC_AVG_SAMPLES>::from_zero(0.0);
     let mut acc_mean: f64 = 0.0;
 
@@ -139,12 +138,8 @@ fn main() -> io::Result<()> {
                         &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
 
                     let vert_acc_minus_g = rotated_acc[2] - &g;
-                    if period_passed(acc_avg_time.elapsed(), ACC_AVG_PERIOD_SEC) {
-                        acc_mean =  acc_mean_filter.get_average();
-                        acc_mean_filter = SumTreeSMA::<f64, f64, ACC_AVG_SAMPLES>::from_zero(acc_mean / 2.0);
-                        acc_avg_time = Instant::now();
-                    }
                     acc_mean_filter.add_sample(vert_acc_minus_g);
+                    acc_mean =  acc_mean_filter.get_average();
 
                     /*
 
