@@ -152,7 +152,7 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "mag field XYZ    (uT) | {:>8.2} {:>8.2} {:>8.2}\n", magnetometer[0], magnetometer[1], magnetometer[2])?;
                     write!(&mut stdout, "roll/pitch/yaw  (deg) | {:>8.1} {:>8.1} {:>8.1}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
                     write!(&mut stdout, "temp              (C) | {:>8.2}\n", all.temp)?;
-                    write!(&mut stdout, "time elapsed  (nanos) | {:>?}                  \n", t.elapsed().as_nanos())?;
+                    write!(&mut stdout, "time elapsed  (nanos) | {:>8?}                 \n", t.elapsed().as_nanos())?;
                     stdout.flush()?;
                     write!(&mut stdout, "{}", move_up_csi_sequence(6))?;
 
