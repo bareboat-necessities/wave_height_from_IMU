@@ -152,9 +152,10 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "mag field XYZ    (uT) | {:>8.2} {:>8.2} {:>8.2}\n", magnetometer[0], magnetometer[1], magnetometer[2])?;
                     write!(&mut stdout, "roll/pitch/yaw  (deg) | {:>8.1} {:>8.1} {:>8.1}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
                     write!(&mut stdout, "temp              (C) | {:>8.2}\n", all.temp)?;
+                    write!(&mut stdout, "accel xyz-g   (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", rotated_acc[0], rotated_acc[1], rotated_acc[2])?;
                     write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
                     stdout.flush()?;
-                    write!(&mut stdout, "{}", move_up_csi_sequence(6))?;
+                    write!(&mut stdout, "{}", move_up_csi_sequence(7))?;
 
                     thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64)
                         .checked_sub(t.elapsed()).expect("Err time subtract"));
