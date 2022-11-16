@@ -141,7 +141,7 @@ fn main() -> io::Result<()> {
                         &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
 
                     //let vert_acc_minus_g = rotated_acc[2] - &g;
-                    let vert_acc_minus_g = (acc_abs - &g) * signum(accelerometer[2]);
+                    let vert_acc_minus_g = (acc_abs - &g) * accelerometer[2].signum();
                     acc_mean_filter.add_sample(vert_acc_minus_g);
                     acc_mean =  acc_mean_filter.get_average();
 
