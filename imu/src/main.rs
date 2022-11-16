@@ -173,8 +173,8 @@ fn main() -> io::Result<()> {
                     )?;
                     stdout.flush()?;
 
-                    thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64)
-                        .checked_sub(t.elapsed()).expect("Err time subtract"));
+                    thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64));
+                    //    .checked_sub(t.elapsed()).expect("Err time subtract"));
                 }
                 Err(err) => {
                     println!("{:>?}", err)
