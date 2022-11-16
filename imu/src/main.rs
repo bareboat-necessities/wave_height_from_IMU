@@ -42,12 +42,12 @@ fn main() -> io::Result<()> {
 
     mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_3)).expect("Err setting rate");
 
+    println!("accel_resolution      | {:>8.5}", mpu9250.accel_resolution());
+    println!("gyro_resolution       | {:>8.5}", mpu9250.gyro_resolution());
     let acc_bias: [f32; 3] = mpu9250.get_accel_bias().expect("Err accel_bias");
     println!("accel_bias            | {:>8.3} {:>8.3} {:>8.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
     let gyro_bias: [f32; 3] = mpu9250.get_gyro_bias().expect("Err gyro_bias");
     println!("gyro_bias             | {:>8.3} {:>8.3} {:>8.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
-    println!("accel_resolution      | {:>15.10}", mpu9250.accel_resolution());
-    println!("gyro_resolution       | {:>15.10}", mpu9250.gyro_resolution());
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
