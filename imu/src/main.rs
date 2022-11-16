@@ -147,13 +147,13 @@ fn main() -> io::Result<()> {
                     }
                      */
 
-                    write!(&mut stdout, "accel XYZ (m/s^2)     | {:>7.3} {:>7.3} {:>7.3}\n", accelerometer[0], accelerometer[1], accelerometer[2])?;
-                    write!(&mut stdout, "gyro XYZ (rad/s)      | {:>7.3} {:>7.3} {:>7.3}\n", gyroscope[0], gyroscope[1], gyroscope[2])?;
-                    write!(&mut stdout, "mag field XYZ (uT)    | {:>7.3} {:>7.3} {:>7.3}\n", magnetometer[0], magnetometer[1], magnetometer[2])?;
-                    write!(&mut stdout, "roll/pitch/yaw (deg)  | {:>7.3} {:>7.3} {:>7.3}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
-                    write!(&mut stdout, "temp (C)              | {:>7.3}\n", all.temp)?;
-                    write!(&mut stdout, "{}", move_up_csi_sequence(5))?;
+                    write!(&mut stdout, "accel XYZ (m/s^2)     | {:>8.3} {:>8.3} {:>8.3}\n", accelerometer[0], accelerometer[1], accelerometer[2])?;
+                    write!(&mut stdout, "gyro XYZ (rad/s)      | {:>8.3} {:>8.3} {:>8.3}\n", gyroscope[0], gyroscope[1], gyroscope[2])?;
+                    write!(&mut stdout, "mag field XYZ (uT)    | {:>8.3} {:>8.3} {:>8.3}\n", magnetometer[0], magnetometer[1], magnetometer[2])?;
+                    write!(&mut stdout, "roll/pitch/yaw (deg)  | {:>8.3} {:>8.3} {:>8.3}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
+                    write!(&mut stdout, "temp (C)              | {:>8.3}\n", all.temp)?;
                     stdout.flush()?;
+                    write!(&mut stdout, "{}", move_up_csi_sequence(5))?;
 
                     thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64));
                     //    .checked_sub(t.elapsed()).expect("Err time subtract"));
@@ -172,4 +172,8 @@ macro_rules! csi {
 
 fn move_up_csi_sequence(count: u16) -> String {
     format!(csi!("{}A"), count)
+}
+
+fn move_down_csi_sequence(count: u16) -> String {
+    format!(csi!("{}B"), count)
 }
