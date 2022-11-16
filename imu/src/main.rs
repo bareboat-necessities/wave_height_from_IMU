@@ -102,7 +102,7 @@ fn main() -> io::Result<()> {
 
     let mut vert_pos = 0.0;
     let mut vert_vel = 0.0;
-    let g = 9.806;
+    let g = 9.81;
     let mut t: usize = 0;
     loop {
         thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
