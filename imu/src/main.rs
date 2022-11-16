@@ -100,10 +100,6 @@ fn main() -> io::Result<()> {
     const SAMPLES: usize = (45.0 / WAIT_SEC) as usize;
     let mut acc_mean = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(0.0);
 
-    writeln!(&mut stdout, "Give process a couple of minutes to self calibrate\n")?;
-    writeln!(&mut stdout,
-             "   Accel XYZ(m/s^2)  |   Gyro XYZ (rad/s)  |  Mag Field XYZ(uT)  | Temp (C) | Roll   | Pitch  | Yaw    | Vert Acc - g (m/s^2) | VVel(m/s) | VPos(m)")?;
-
     let mut vert_pos = 0.0;
     let mut vert_vel = 0.0;
     let g = 9.806;
@@ -130,7 +126,7 @@ fn main() -> io::Result<()> {
                         .unwrap();
                     let (roll, pitch, yaw) = quat.euler_angles();
 
-                    let rotated_acc= quat.transform_vector(
+                    let rotated_acc = quat.transform_vector(
                         &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
 
                     let vert_acc_minus_g = rotated_acc[2] - g;
@@ -151,26 +147,12 @@ fn main() -> io::Result<()> {
                     }
                      */
 
-                    write!(&mut stdout,
-                           "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.2}   | {:>7.3}",
-                           //t.elapsed(),
-                           accelerometer[0],
-                           accelerometer[1],
-                           accelerometer[2],
-                           gyroscope[0],
-                           gyroscope[1],
-                           gyroscope[2],
-                           magnetometer[0],
-                           magnetometer[1],
-                           magnetometer[2],
-                           all.temp,
-                           roll * 180.0 / f64::consts::PI,
-                           pitch * 180.0 / f64::consts::PI,
-                           yaw * 180.0 / f64::consts::PI,
-                           vert_acc_minus_g,
-                           vert_vel,
-                           vert_pos
-                    )?;
+                    write!(&mut stdout, "accel XYZ (m/s^2)     | {:>7.3} {:>7.3} {:>7.3}\n", accelerometer[0], accelerometer[1], accelerometer[2])?;
+                    write!(&mut stdout, "gyro XYZ (rad/s)      | {:>7.3} {:>7.3} {:>7.3}\n", gyroscope[0], gyroscope[1], gyroscope[2])?;
+                    write!(&mut stdout, "mag field XYZ (uT)    | {:>7.3} {:>7.3} {:>7.3}\n", magnetometer[0], magnetometer[1], magnetometer[2])?;
+                    write!(&mut stdout, "roll/pitch/yaw (deg)  | {:>7.3} {:>7.3} {:>7.3}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
+                    write!(&mut stdout, "temp (C)              | {:>7.3}\n", all.temp)?;
+                    write!(&mut stdout, "\r\r\r\r\r")?;
                     stdout.flush()?;
 
                     thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64));
