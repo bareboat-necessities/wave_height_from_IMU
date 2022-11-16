@@ -41,7 +41,7 @@ while True:
         data = imu.getIMUData()
         fusionPose = data["fusionPose"]
         accel = data["accel"]
-        print("r: %f p: %f y: %f ax: %f ay: %f az: %f" % (math.degrees(fusionPose[0]),
+        print("r: %f p: %f y: %f ax: %f ay: %f az: %f\r" % (math.degrees(fusionPose[0]),
                                      math.degrees(fusionPose[1]),
                                      math.degrees(fusionPose[2]),
                                      accel[0],
