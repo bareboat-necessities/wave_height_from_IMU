@@ -40,7 +40,7 @@ fn main() -> io::Result<()> {
     println!("ak8963 who_am_I       |     0x{:x}", mag_who_am_i);
     assert_eq!(who_am_i, 0x71);
 
-    mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_3)).expect("Err setting rate");
+    mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_1)).expect("Err setting rate");
 
     println!("accel resolution      | {:>8.5}", mpu9250.accel_resolution());
     println!("gyro resolution       | {:>8.5}", mpu9250.gyro_resolution());
@@ -55,8 +55,8 @@ fn main() -> io::Result<()> {
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
 
-    const IMU_SAMPLE_SEC: f64 = 0.02;
-    const ACC_SAMPLE_PERIOD_SEC: f64 = IMU_SAMPLE_SEC * 20.0;
+    const IMU_SAMPLE_SEC: f64 = 0.001;
+    const ACC_SAMPLE_PERIOD_SEC: f64 = IMU_SAMPLE_SEC * 1.0;
     const ACC_AVG_PERIOD_SEC: f64 = 45.0;
     const WARMUP_PERIOD_SEC: f64 = 50.0;
     const ACC_AVG_SAMPLES: usize = (ACC_AVG_PERIOD_SEC / IMU_SAMPLE_SEC) as usize;
