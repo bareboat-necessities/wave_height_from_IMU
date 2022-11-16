@@ -107,61 +107,66 @@ fn main() -> io::Result<()> {
     loop {
         thread::sleep(Duration::from_micros((WAIT_SEC * 1000000.0) as u64));
 
-        let all: MargMeasurements<[f32; 3]> = mpu9250.all().expect("unable to read from MPU!");
+        loop {
+            match mpu9250.all() {
+                Ok(all: MargMeasurements<[f32; 3]>) => {
+                    // Obtain sensor values from a source
+                    let gyroscope: Vector3<f64> = Vector3::new(all.gyro[0] as f64, all.gyro[1] as f64, all.gyro[2] as f64);
+                    let accelerometer: Vector3<f64> = Vector3::new(all.accel[0] as f64, all.accel[1] as f64, all.accel[2] as f64);
+                    let magnetometer: Vector3<f64> = Vector3::new(all.mag[0] as f64, all.mag[1] as f64, all.mag[2] as f64);
 
-        // Obtain sensor values from a source
-        let gyroscope: Vector3<f64> = Vector3::new(all.gyro[0] as f64, all.gyro[1] as f64, all.gyro[2] as f64);
-        let accelerometer: Vector3<f64> = Vector3::new(all.accel[0] as f64, all.accel[1] as f64, all.accel[2] as f64);
-        let magnetometer: Vector3<f64> = Vector3::new(all.mag[0] as f64, all.mag[1] as f64, all.mag[2] as f64);
+                    // Run inputs through AHRS filter (gyroscope must be radians/s)
+                    let quat = ahrs
+                        .update(
+                            &gyroscope,
+                            &accelerometer,
+                            &magnetometer
+                        )
+                        .unwrap();
+                    let (roll, pitch, yaw) = quat.euler_angles();
 
-        // Run inputs through AHRS filter (gyroscope must be radians/s)
-        let quat = ahrs
-            .update(
-                &gyroscope,
-                &accelerometer,
-                &magnetometer
-            )
-            .unwrap();
-        let (roll, pitch, yaw) = quat.euler_angles();
+                    let rotated_acc= quat.transform_vector(
+                        &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
 
-        let rotated_acc= quat.transform_vector(
-            &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
+                    let vert_acc_minus_g = rotated_acc[2] - g;
 
-        let vert_acc_minus_g = rotated_acc[2] - g;
+                    t = t + 1;
+                    if SAMPLES <= t && t <= (2 * SAMPLES) {
+                        acc_mean.add_sample(vert_acc_minus_g);
+                    }
 
-        t = t + 1;
-        if SAMPLES <= t && t <= (2 * SAMPLES) {
-            acc_mean.add_sample(vert_acc_minus_g);
+                    if t >= (2 * SAMPLES) {
+                        filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
+                        filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
+                        predicted = predict_step(&kf, &filtered);
+                        vert_pos = filtered.x[1];
+                        vert_vel = filtered.x[2];
+                        t = 2 * SAMPLES
+                    }
+
+                    write!(&mut stdout,
+                           "{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.2}   | {:>7.3}",
+                           accelerometer[0],
+                           accelerometer[1],
+                           accelerometer[2],
+                           gyroscope[0],
+                           gyroscope[1],
+                           gyroscope[2],
+                           magnetometer[0],
+                           magnetometer[1],
+                           magnetometer[2],
+                           all.temp,
+                           roll * 180.0 / f64::consts::PI,
+                           pitch * 180.0 / f64::consts::PI,
+                           yaw * 180.0 / f64::consts::PI,
+                           vert_acc_minus_g - acc_mean.get_average(),
+                           vert_vel,
+                           vert_pos
+                    )?;
+                }
+
+            }
         }
-
-        if t >= (2 * SAMPLES) {
-            filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
-            filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean.get_average());
-            predicted = predict_step(&kf, &filtered);
-            vert_pos = filtered.x[1];
-            vert_vel = filtered.x[2];
-            t = 2 * SAMPLES
-        }
-
-        write!(&mut stdout,
-               "\r{:>6.2} {:>6.2} {:>6.2} |{:>6.1} {:>6.1} {:>6.1} |{:>6.1} {:>6.1} {:>6.1} | {:>4.1}     | {:>6.1} | {:>6.1} | {:>6.1} | {:>7.3}              | {:>7.2}   | {:>7.3}",
-               accelerometer[0],
-               accelerometer[1],
-               accelerometer[2],
-               gyroscope[0],
-               gyroscope[1],
-               gyroscope[2],
-               magnetometer[0],
-               magnetometer[1],
-               magnetometer[2],
-               all.temp,
-               roll * 180.0 / f64::consts::PI,
-               pitch * 180.0 / f64::consts::PI,
-               yaw * 180.0 / f64::consts::PI,
-               vert_acc_minus_g - acc_mean.get_average(),
-               vert_vel,
-               vert_pos
-        )?;
         stdout.flush()?;
     }
 }
