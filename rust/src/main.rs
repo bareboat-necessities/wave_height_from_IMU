@@ -76,21 +76,22 @@ fn main() {
     let acc_mean = mean(&acc);
 
     // With no integral drift correction
-    let mut predicted: Vec<KalmanState> = Vec::with_capacity(n_timesteps+1);
-    let mut filtered: Vec<KalmanState> = Vec::with_capacity(n_timesteps);
+    let mut predicted: KalmanState = KalmanState { x: (kf.x0).clone(), p: (kf.p0).clone() };
+    let mut filtered: KalmanState;
 
-    predicted.push(KalmanState { x: (kf.x0).clone(), p: (kf.p0).clone() });
+    let mut filtered_result: Vec<KalmanState> = Vec::with_capacity(n_timesteps);
 
     for k in 0..n_timesteps {
-        filtered.push(update_step(&kf, &predicted[k], &data[k]));
-        filtered[k].x = &filtered[k].x + &b * (acc[k] - acc_mean);
-        predicted.push(predict_step(&kf, &filtered[k]));
+        filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
+        filtered.x = &filtered.x + &b * (acc[k] - acc_mean);
+        predicted = predict_step(&kf, &filtered);
+        filtered_result.push(filtered);
     }
 
     let mut result_pos: Vec<f64> = Vec::new();
     //let mut result_vel: Vec<f64> = Vec::new();
     for t in 0..n_timesteps {
-        result_pos.push(filtered[t].x[1]);
+        result_pos.push(filtered_result[t].x[1]);
         //result_vel.push(filtered[t].x[2]);
     }
 
