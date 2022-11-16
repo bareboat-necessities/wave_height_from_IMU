@@ -36,19 +36,18 @@ fn main() -> io::Result<()> {
     let who_am_i = mpu9250.who_am_i().expect("could not read WHO_AM_I");
     let mag_who_am_i = mpu9250.ak8963_who_am_i()
         .expect("could not read magnetometer's WHO_AM_I");
-    println!("WHO_AM_I: 0x{:x}", who_am_i);
-    println!("AK8963 WHO_AM_I: 0x{:x}", mag_who_am_i);
+    println!("WHO_AM_I              | 0x{:x}", who_am_i);
+    println!("AK8963 WHO_AM_I       | 0x{:x}", mag_who_am_i);
     assert_eq!(who_am_i, 0x71);
-
-    let acc_bias: [f32; 3] = mpu9250.get_accel_bias().expect("Err accel_bias");
-    println!("accel_bias {:>7.3} {:>7.3} {:>7.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
-    println!("accel_resolution {:>15.10}", mpu9250.accel_resolution());
 
     mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_3)).expect("Err setting rate");
 
+    let acc_bias: [f32; 3] = mpu9250.get_accel_bias().expect("Err accel_bias");
+    println!("accel_bias            | {:>8.3} {:>8.3} {:>8.3}", acc_bias[0], acc_bias[1], acc_bias[2]);
     let gyro_bias: [f32; 3] = mpu9250.get_gyro_bias().expect("Err gyro_bias");
-    println!("gyro_bias {:>7.3} {:>7.3} {:>7.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
-    println!("gyro_resolution {:>15.10}", mpu9250.gyro_resolution());
+    println!("gyro_bias             | {:>8.3} {:>8.3} {:>8.3}", gyro_bias[0], gyro_bias[1], gyro_bias[2]);
+    println!("accel_resolution      | {:>15.10}", mpu9250.accel_resolution());
+    println!("gyro_resolution       | {:>15.10}", mpu9250.gyro_resolution());
 
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
