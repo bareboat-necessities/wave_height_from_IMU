@@ -111,6 +111,7 @@ fn main() -> io::Result<()> {
     let mut acc_avg_time = Instant::now();
     let mut acc_mean_filter = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(0.0);
     let mut acc_mean: f64 = 0.0;
+
     loop {
         loop {
             let mut t = Instant::now();
@@ -137,7 +138,7 @@ fn main() -> io::Result<()> {
                     let vert_acc_minus_g = rotated_acc[2] - &g;
                     if acc_avg_time.elapsed().saturating_sub(Duration::from_micros((ACC_AVG_PERIOD_SEC * 1000000.0) as u64)) != Duration::ZERO {
                         acc_mean =  acc_mean_filter.get_average();
-                        acc_mean_filter = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(acc_mean);
+                        acc_mean_filter = SumTreeSMA::<f64, f64, SAMPLES>::from_zero(acc_mean / 2.0);
                         acc_avg_time = Instant::now();
                     }
                     acc_mean_filter.add_sample(vert_acc_minus_g);
