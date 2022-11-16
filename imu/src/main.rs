@@ -18,7 +18,9 @@ use mpu9250::{Mpu9250, MargMeasurements, AccelDataRate, Dlpf};
 
 use ahrs::{Ahrs, Madgwick};
 use nalgebra::{Vector3, Quaternion, UnitQuaternion};
-use std::{f64, Instant};
+
+use std::{f64};
+use std::time::Instant;
 
 use rulinalg::vector::Vector;
 use linearkalman::{KalmanFilter, KalmanState, update_step, predict_step};
