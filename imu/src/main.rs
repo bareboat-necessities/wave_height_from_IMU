@@ -36,8 +36,8 @@ fn main() -> io::Result<()> {
     let who_am_i = mpu9250.who_am_i().expect("could not read WHO_AM_I");
     let mag_who_am_i = mpu9250.ak8963_who_am_i()
         .expect("could not read magnetometer's WHO_AM_I");
-    println!("WHO_AM_I              | 0x{:x}", who_am_i);
-    println!("AK8963 WHO_AM_I       | 0x{:x}", mag_who_am_i);
+    println!("WHO_AM_I              |     0x{:x}", who_am_i);
+    println!("AK8963 WHO_AM_I       |     0x{:x}", mag_who_am_i);
     assert_eq!(who_am_i, 0x71);
 
     mpu9250.accel_data_rate(AccelDataRate::DlpfConf(Dlpf::_3)).expect("Err setting rate");
