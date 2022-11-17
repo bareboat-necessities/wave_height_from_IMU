@@ -77,7 +77,7 @@ P0 = [[PosIntegral_Variance, 0, 0],
       [0, 0, 0]]
 
 # Evaluate signal offset from 0
-Acc_Mean = [[0.0]]  # TODO: calculate using running avg over long periods 1 mins or so.
+Acc_Mean = np.array([0.0])  # TODO: calculate using running avg over long periods 1 mins or so.
 
 filtered_state_means = X0
 filtered_state_covariances = P0
@@ -100,8 +100,8 @@ while True:
         alignedAccel = quaternion.rotvecquat(accel, data['fusionQPose'])
 
         observation = 0
-        acc = alignedAccel[2]
-        transition_offset = B * acc
+        acc = np.array([alignedAccel[2]])
+        transition_offset = B * (acc - Acc_Mean)
         filtered_state_means, filtered_state_covariances = kf.filter_update(
             filtered_state_mean=filtered_state_means,
             filtered_state_covariance=filtered_state_covariances,
