@@ -176,7 +176,7 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
                     write!(&mut stdout, "loop time    (micros) | {:>8?}                 \n", loop_time.as_micros())?;
                     stdout.flush()?;
-                    write!(&mut stdout, "{}", move_up_csi_sequence(13))?;
+                    //write!(&mut stdout, "{}", move_up_csi_sequence(13))?;
 
                     thread::sleep(Duration::from_micros((IMU_POLLING_SEC * 1000000.0) as u64));
                     loop_time = t.elapsed();
