@@ -85,7 +85,7 @@ P0 = [[PosIntegral_Variance, 0, 0],
 
 # Evaluate signal offset from 0
 Acc_Mean = np.array([0.0])  # TODO: calculate using running avg over long periods 1 mins or so.
-Avg_Window = 50 / dt # over 50 sec
+Avg_Window = int(50 / dt)  # over 50 sec
 
 filtered_state_means = X0
 filtered_state_covariances = P0
