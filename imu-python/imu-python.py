@@ -19,7 +19,7 @@ imu = RTIMU.RTIMU(s)
 
 print("IMU Name: " + imu.IMUName())
 
-if (not imu.IMUInit()):
+if not imu.IMUInit():
     print("IMU Init Failed")
     sys.exit(1)
 else:
