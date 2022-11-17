@@ -102,7 +102,7 @@ while True:
         alignedAccel = quaternion.rotvecquat(accel, data['fusionQPose'])
 
         observation = 0
-        acc = np.array([g * alignedAccel[2]])
+        acc = np.array([g * alignedAccel[2] - g])
         transition_offset = B * (acc - Acc_Mean)
         filtered_state_means, filtered_state_covariances = kf.filter_update(
             filtered_state_mean=filtered_state_means,
