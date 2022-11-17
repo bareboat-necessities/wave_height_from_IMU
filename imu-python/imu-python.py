@@ -109,7 +109,7 @@ while True:
 
         observation = 0
         acc = np.array([g * alignedAccel[2] - g])
-        Acc_Mean = np.array([moving_average(acc[0], Avg_Window)])
+        Acc_Mean = np.array([moving_average(g * alignedAccel[2] - g, Avg_Window)])
         transition_offset = B * (acc - Acc_Mean)
         filtered_state_means, filtered_state_covariances = kf.filter_update(
             filtered_state_mean=filtered_state_means,
