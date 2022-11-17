@@ -119,9 +119,9 @@ while True:
             accel[0],
             accel[1],
             accel[2],
-            alignedAccel[0],
-            alignedAccel[1],
-            alignedAccel[2]), flush=False)
+            alignedAccel[0] * g,
+            alignedAccel[1] * g,
+            alignedAccel[2] * g), flush=False)
         print("vel: %f pos %f" % (
             filtered_state_means[2],
             filtered_state_means[1]), flush=True)
