@@ -46,10 +46,10 @@ def rotvecquat(v, q):
 
 
 def toeuler(q):
-    roll = math.atan2(2.0 * (q[2] * q[3] + q[0] * q[1]), \
+    roll = math.atan2(2.0 * (q[2] * q[3] + q[0] * q[1]),
                       1 - 2.0 * (q[1] * q[1] + q[2] * q[2]))
     pitch = math.asin(min(max(2.0 * (q[0] * q[2] - q[1] * q[3]), -1), 1))
-    heading = math.atan2(2.0 * (q[1] * q[2] + q[0] * q[3]), \
+    heading = math.atan2(2.0 * (q[1] * q[2] + q[0] * q[3]),
                          1 - 2.0 * (q[2] * q[2] + q[3] * q[3]))
     return roll, pitch, heading
 
