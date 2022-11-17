@@ -192,6 +192,7 @@ fn main() -> io::Result<()> {
                                 // will use previous measurements
                                 println!("skipped measurement");
                                 loop_time = tt;
+                                t = Instant::now();
                                 continue;
                             }
                         }
