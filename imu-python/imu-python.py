@@ -47,6 +47,6 @@ while True:
                                      accel[0],
                                      accel[1],
                                      accel[2]), end=" ", flush=True)
+        print(end="\r", flush=False)
         time.sleep(poll_interval*1.0/1000.0)
-        print("\r", end=" ", flush=False)
 
