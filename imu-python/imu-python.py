@@ -39,8 +39,8 @@ imu.setCompassEnable(True)
 poll_interval = imu.IMUGetPollInterval()
 print("Recommended Poll Interval: %dmS\n" % poll_interval)
 
-PosIntegral_Variance = 100  # TODO: ???
-PosIntegral_Trans_Variance = 100  # TODO: ???
+PosIntegral_Variance = 1 # TODO: ???
+PosIntegral_Trans_Variance = 1  # TODO: ???
 
 g = 9.81
 
