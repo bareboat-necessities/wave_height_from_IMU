@@ -6,6 +6,7 @@ import RTIMU
 import os.path
 import time
 import math
+import quaternion
 
 SETTINGS_FILE = "RTIMULib"
 
@@ -44,12 +45,16 @@ while True:
         accel = data["accel"]
         timestamp = data["timestamp"]
         timestamp_ms = timestamp / 1000
-        print("t: %f, r: %f p: %f y: %f ax: %f ay: %f az: %f" % (timestamp_ms,
+        alignedAccel = quaternion.multiply(data['fusionQPose'], accel)
+        print("t: %f, r: %f p: %f y: %f ax: %f ay: %f az: %f  aax: %f aay: %f aaz: %f" % (timestamp_ms,
                                      math.degrees(fusionPose[0]),
                                      math.degrees(fusionPose[1]),
                                      math.degrees(fusionPose[2]),
                                      accel[0],
                                      accel[1],
-                                     accel[2]), flush=True)
+                                     accel[2],
+                                     alignedAccel[0],
+                                     alignedAccel[1],
+                                     alignedAccel[2]), flush=True)
         time.sleep(poll_interval*1.0/1000.0)
         print("\033[A", end="", flush=False)
