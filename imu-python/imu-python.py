@@ -100,7 +100,8 @@ while True:
         alignedAccel = np.asarray(quaternion.rotvecquat(accel, data['fusionQPose']))
 
         observation = 0
-        transition_offset = B * (alignedAccel[2] - Acc_Mean)
+        acc = alignedAccel[2]
+        transition_offset = B * (acc - Acc_Mean)
         filtered_state_means, filtered_state_covariances = kf.filter_update(
             filtered_state_mean=filtered_state_means,
             filtered_state_covariance=filtered_state_covariances,
