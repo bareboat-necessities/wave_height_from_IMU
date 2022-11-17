@@ -119,6 +119,7 @@ fn main() -> io::Result<()> {
 
     loop {
         let mut ta = Instant::now();
+        let mut loop_time = ta.elapsed();
         loop {
             let t = Instant::now();
             match mpu9250.all::<[f32; 3]>() {
@@ -173,10 +174,12 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "vert_pos          (m) | {:>8.3} \n", vert_pos)?;
                     write!(&mut stdout, "uptime       (millis) | {:>8?}                 \n", start.elapsed().as_millis())?;
                     write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
+                    write!(&mut stdout, "loop time    (micros) | {:>8?}                 \n", loop_time.as_micros())?;
                     stdout.flush()?;
-                    write!(&mut stdout, "{}", move_up_csi_sequence(12))?;
+                    write!(&mut stdout, "{}", move_up_csi_sequence(14))?;
 
                     thread::sleep(Duration::from_micros((IMU_POLLING_SEC * 1000000.0) as u64));
+                    loop_time = t.elapsed();
                 }
                 Err(err) => {
                     println!("{:>?}", err)
