@@ -12,11 +12,11 @@ extern crate linearkalman;
 
 use std::io::{self, Write};
 use std::thread;
-use std::time::{Duration, SystemTime};
+use std::time::{Duration};
 
 use hal::Delay;
 use hal::I2cdev;
-use mpu9250::{Mpu9250, MargMeasurements, AccelDataRate, Dlpf};
+use mpu9250::{Mpu9250, AccelDataRate, Dlpf};
 
 use ahrs::{Ahrs, Madgwick};
 use nalgebra::{Vector3, Quaternion, UnitQuaternion};
