@@ -58,7 +58,7 @@ fn main() -> io::Result<()> {
     let mut stdout = stdout.lock();
 
     const IMU_SAMPLE_SEC: f64 = 0.01;
-    const IMU_POLLING_SEC: f64 = 0.004;
+    //const IMU_POLLING_SEC: f64 = 0.004;
     const ACC_SAMPLE_PERIOD_SEC: f64 = IMU_SAMPLE_SEC * 1.0;
     const ACC_AVG_PERIOD_SEC: f64 = 45.0;
     const WARMUP_PERIOD_SEC: f64 = 50.0;
@@ -129,57 +129,71 @@ fn main() -> io::Result<()> {
                     let accelerometer: Vector3<f64> = Vector3::new(all.accel[0] as f64, all.accel[1] as f64, all.accel[2] as f64);
                     let magnetometer: Vector3<f64> = Vector3::new(all.mag[0] as f64, all.mag[1] as f64, all.mag[2] as f64);
 
-                    // Run inputs through AHRS filter (gyroscope must be radians/s)
-                    let quat = ahrs
-                        .update(
-                            &gyroscope,
-                            &accelerometer,
-                            &magnetometer
-                        )
-                        .unwrap();
-                    let (roll, pitch, yaw) = quat.euler_angles();
+                    loop {
+                        // Use previous measurements if time slot measurement was skipped
 
-                    let acc_abs = Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64).magnitude();
+                        // Run inputs through AHRS filter (gyroscope must be radians/s)
+                        let quat = ahrs
+                            .update(
+                                &gyroscope,
+                                &accelerometer,
+                                &magnetometer
+                            )
+                            .unwrap();
+                        let (roll, pitch, yaw) = quat.euler_angles();
 
-                    let rotated_acc = quat.transform_vector(
-                        &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
+                        let acc_abs = Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64).magnitude();
 
-                    let vert_acc_minus_g = rotated_acc[2] - &g;
-                    acc_mean_filter.add_sample(vert_acc_minus_g);
-                    if acc_mean_filter.get_num_samples() == AVG_SAMPLES {
-                        acc_mean =  acc_mean_filter.get_average();
+                        let rotated_acc = quat.transform_vector(
+                            &Vector3::new(accelerometer[0] as f64, accelerometer[1] as f64, accelerometer[2] as f64));
+
+                        let vert_acc_minus_g = rotated_acc[2] - &g;
+                        acc_mean_filter.add_sample(vert_acc_minus_g);
+                        if acc_mean_filter.get_num_samples() == AVG_SAMPLES {
+                            acc_mean =  acc_mean_filter.get_average();
+                        }
+
+                        if period_expired(ta.elapsed(), ACC_SAMPLE_PERIOD_SEC)
+                            && period_expired(start.elapsed(), WARMUP_PERIOD_SEC) {
+                            k = k + 1;
+                            ta = Instant::now();
+
+                            filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
+                            filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean);
+                            predicted = predict_step(&kf, &filtered);
+                            vert_pos = filtered.x[1];
+                            vert_vel = filtered.x[2];
+                        }
+
+                        write!(&mut stdout, "accel XYZ     (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", accelerometer[0], accelerometer[1], accelerometer[2])?;
+                        write!(&mut stdout, "gyro XYZ      (rad/s) | {:>8.2} {:>8.2} {:>8.2}\n", gyroscope[0], gyroscope[1], gyroscope[2])?;
+                        write!(&mut stdout, "mag field XYZ    (uT) | {:>8.2} {:>8.2} {:>8.2}\n", magnetometer[0], magnetometer[1], magnetometer[2])?;
+                        write!(&mut stdout, "roll/pitch/yaw  (deg) | {:>8.1} {:>8.1} {:>8.1}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
+                        write!(&mut stdout, "temp              (C) | {:>8.2}\n", all.temp)?;
+                        write!(&mut stdout, "accel ref xyz (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", rotated_acc[0], rotated_acc[1], rotated_acc[2])?;
+                        write!(&mut stdout, "acc_abs       (m/s^2) | {:>8.3} \n", acc_abs)?;
+                        write!(&mut stdout, "acc_z/avg     (m/s^2) | {:>8.3} {:>8.3}\n", vert_acc_minus_g - acc_mean, acc_mean)?;
+                        write!(&mut stdout, "vert_vel        (m/s) | {:>8.3} \n", vert_vel)?;
+                        write!(&mut stdout, "vert_pos          (m) | {:>8.3} \n", vert_pos)?;
+                        write!(&mut stdout, "uptime       (millis) | {:>8?}                 \n", start.elapsed().as_millis())?;
+                        write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
+                        write!(&mut stdout, "loop time    (micros) | {:>8?}                 \n", loop_time.as_micros())?;
+                        stdout.flush()?;
+                        write!(&mut stdout, "{}", move_up_csi_sequence(13))?;
+
+                        match Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64).checked_sub(t.elapsed()) {
+                            Ok(diff) => {
+                                thread::sleep(diff);
+                                loop_time = t.elapsed();
+                                break;
+                            },
+                            None => {
+                                // will use previous measurements
+                                loop_time = t.elapsed();
+                                continue;
+                            }
+                        }
                     }
-
-                    if period_expired(ta.elapsed(), ACC_SAMPLE_PERIOD_SEC)
-                        && period_expired(start.elapsed(), WARMUP_PERIOD_SEC) {
-                        k = k + 1;
-                        ta = Instant::now();
-
-                        filtered = update_step(&kf, &predicted, &Vector::new(vec![0.0]));
-                        filtered.x = &filtered.x + &b * (vert_acc_minus_g - acc_mean);
-                        predicted = predict_step(&kf, &filtered);
-                        vert_pos = filtered.x[1];
-                        vert_vel = filtered.x[2];
-                    }
-
-                    write!(&mut stdout, "accel XYZ     (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", accelerometer[0], accelerometer[1], accelerometer[2])?;
-                    write!(&mut stdout, "gyro XYZ      (rad/s) | {:>8.2} {:>8.2} {:>8.2}\n", gyroscope[0], gyroscope[1], gyroscope[2])?;
-                    write!(&mut stdout, "mag field XYZ    (uT) | {:>8.2} {:>8.2} {:>8.2}\n", magnetometer[0], magnetometer[1], magnetometer[2])?;
-                    write!(&mut stdout, "roll/pitch/yaw  (deg) | {:>8.1} {:>8.1} {:>8.1}\n", roll * 180.0 / f64::consts::PI, pitch * 180.0 / f64::consts::PI, yaw * 180.0 / f64::consts::PI)?;
-                    write!(&mut stdout, "temp              (C) | {:>8.2}\n", all.temp)?;
-                    write!(&mut stdout, "accel ref xyz (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", rotated_acc[0], rotated_acc[1], rotated_acc[2])?;
-                    write!(&mut stdout, "acc_abs       (m/s^2) | {:>8.3} \n", acc_abs)?;
-                    write!(&mut stdout, "acc_z/avg     (m/s^2) | {:>8.3} {:>8.3}\n", vert_acc_minus_g - acc_mean, acc_mean)?;
-                    write!(&mut stdout, "vert_vel        (m/s) | {:>8.3} \n", vert_vel)?;
-                    write!(&mut stdout, "vert_pos          (m) | {:>8.3} \n", vert_pos)?;
-                    write!(&mut stdout, "uptime       (millis) | {:>8?}                 \n", start.elapsed().as_millis())?;
-                    write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
-                    write!(&mut stdout, "loop time    (micros) | {:>8?}                 \n", loop_time.as_micros())?;
-                    stdout.flush()?;
-                    write!(&mut stdout, "{}", move_up_csi_sequence(13))?;
-
-                    thread::sleep(Duration::from_micros((IMU_POLLING_SEC * 1000000.0) as u64));
-                    loop_time = t.elapsed();
                 }
                 Err(err) => {
                     println!("{:>?}", err)
