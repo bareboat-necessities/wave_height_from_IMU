@@ -57,7 +57,7 @@ fn main() -> io::Result<()> {
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
 
-    const IMU_SAMPLE_SEC: f64 = 0.005;
+    const IMU_SAMPLE_SEC: f64 = 0.02;
     //const IMU_POLLING_SEC: f64 = 0.004;
     const ACC_SAMPLE_PERIOD_SEC: f64 = IMU_SAMPLE_SEC * 1.0;
     const ACC_AVG_PERIOD_SEC: f64 = 45.0;
