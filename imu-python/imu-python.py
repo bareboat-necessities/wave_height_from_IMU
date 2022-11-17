@@ -50,6 +50,6 @@ while True:
                                      math.degrees(fusionPose[2]),
                                      accel[0],
                                      accel[1],
-                                     accel[2]), end="", flush=True)
+                                     accel[2]), flush=True)
         time.sleep(poll_interval*1.0/1000.0)
-        print(end="\r", flush=False)
+        print(end="\x1B[1", flush=False)
