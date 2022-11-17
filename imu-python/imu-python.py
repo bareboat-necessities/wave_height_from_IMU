@@ -42,6 +42,8 @@ print("Recommended Poll Interval: %dmS\n" % poll_interval)
 PosIntegral_Variance = 100  # TODO: ???
 PosIntegral_Trans_Variance = 100  # TODO: ???
 
+g = 9.81
+
 # time step
 dt = 0.01  # TODO: get it from two sequential data["timestamp"]
 
@@ -100,7 +102,7 @@ while True:
         alignedAccel = quaternion.rotvecquat(accel, data['fusionQPose'])
 
         observation = 0
-        acc = np.array([alignedAccel[2]])
+        acc = np.array([g * alignedAccel[2]])
         transition_offset = B * (acc - Acc_Mean)
         filtered_state_means, filtered_state_covariances = kf.filter_update(
             filtered_state_mean=filtered_state_means,
