@@ -189,6 +189,7 @@ fn main() -> io::Result<()> {
                             },
                             None => {
                                 // will use previous measurements
+                                println!("skipped measurement");
                                 loop_time = t.elapsed();
                                 continue;
                             }
