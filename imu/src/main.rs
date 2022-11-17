@@ -182,7 +182,7 @@ fn main() -> io::Result<()> {
                         write!(&mut stdout, "{}", move_up_csi_sequence(13))?;
 
                         match Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64).checked_sub(t.elapsed()) {
-                            Ok(diff) => {
+                            Some(diff) => {
                                 thread::sleep(diff);
                                 loop_time = t.elapsed();
                                 break;
