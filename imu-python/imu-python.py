@@ -43,7 +43,8 @@ while True:
         fusionQPose = data["fusionQPose"]
         accel = data["accel"]
         timestamp = data["timestamp"]
-        print("t: %f, r: %f p: %f y: %f ax: %f ay: %f az: %f" % (timestamp,
+        timestamp_ms = timestamp / 1000
+        print("t: %f, r: %f p: %f y: %f ax: %f ay: %f az: %f" % (timestamp_ms,
                                      math.degrees(fusionPose[0]),
                                      math.degrees(fusionPose[1]),
                                      math.degrees(fusionPose[2]),
