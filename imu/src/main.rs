@@ -124,7 +124,6 @@ fn main() -> io::Result<()> {
             let mut t = Instant::now();
             match mpu9250.all::<[f32; 3]>() {
                 Ok(all ) => {
-                    sample_time = start.elapsed().as_millis();
                     // Obtain sensor values from a source
                     let gyroscope: Vector3<f64> = Vector3::new(all.gyro[0] as f64, all.gyro[1] as f64, all.gyro[2] as f64);
                     let accelerometer: Vector3<f64> = Vector3::new(all.accel[0] as f64, all.accel[1] as f64, all.accel[2] as f64);
@@ -132,6 +131,7 @@ fn main() -> io::Result<()> {
 
                     loop {
                         // Use previous measurements if time slot measurement was skipped
+                        let sample_time = start.elapsed().as_millis();
 
                         // Run inputs through AHRS filter (gyroscope must be radians/s)
                         let quat = ahrs
