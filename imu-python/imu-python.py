@@ -45,7 +45,7 @@ while True:
         accel = data["accel"]
         timestamp = data["timestamp"]
         timestamp_ms = timestamp / 1000
-        alignedAccel = quaternion.multiply(data['fusionQPose'], accel)
+        alignedAccel = quaternion.rotvecquat(accel, data['fusionQPose'])
         print("t: %f, r: %f p: %f y: %f ax: %f ay: %f az: %f  aax: %f aay: %f aaz: %f" % (timestamp_ms,
                                      math.degrees(fusionPose[0]),
                                      math.degrees(fusionPose[1]),

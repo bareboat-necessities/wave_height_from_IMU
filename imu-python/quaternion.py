@@ -16,7 +16,6 @@ def angvec2quat(angle, v):
         fac = 0
     else:
         fac = math.sin(angle/2) / n
-
     return [math.cos(angle/2), v[0]*fac, v[1]*fac, v[2]*fac]
 
 
@@ -28,7 +27,6 @@ def vec2vec2quat(a, b):
     n = vector.cross(a, b)
     fac = vector.dot(a, b) / vector.norm(a) / vector.norm(b)
     fac = min(max(fac, -1), 1) # protect against possible slight numerical errors
-
     ang = math.acos(fac)
     return angvec2quat(ang, n)
 
