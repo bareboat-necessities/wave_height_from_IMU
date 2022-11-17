@@ -52,4 +52,4 @@ while True:
                                      accel[1],
                                      accel[2]), flush=True)
         time.sleep(poll_interval*1.0/1000.0)
-        print(end="\x1B[1", flush=False)
+        print("\x1B[1", end="", flush=False)
