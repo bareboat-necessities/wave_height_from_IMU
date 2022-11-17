@@ -12,6 +12,11 @@ import time
 import math
 import quaternion
 
+
+def moving_average(x, w):
+    return np.convolve(x, np.ones(w), 'valid') / w
+
+
 SETTINGS_FILE = "RTIMULib"
 
 print("Using settings file " + SETTINGS_FILE + ".ini")
@@ -80,6 +85,7 @@ P0 = [[PosIntegral_Variance, 0, 0],
 
 # Evaluate signal offset from 0
 Acc_Mean = np.array([0.0])  # TODO: calculate using running avg over long periods 1 mins or so.
+Avg_Window = 50 / dt # over 50 sec
 
 filtered_state_means = X0
 filtered_state_covariances = P0
@@ -103,6 +109,7 @@ while True:
 
         observation = 0
         acc = np.array([g * alignedAccel[2] - g])
+        Acc_Mean = moving_average(acc, Avg_Window)
         transition_offset = B * (acc - Acc_Mean)
         filtered_state_means, filtered_state_covariances = kf.filter_update(
             filtered_state_mean=filtered_state_means,
