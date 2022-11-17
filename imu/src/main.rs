@@ -117,12 +117,6 @@ fn main() -> io::Result<()> {
     let mut acc_mean_filter = SumTreeSMA::<f64, f64, AVG_SAMPLES>::from_zero(0.0);
     let mut acc_mean: f64 = 0.0;
 
-    let mut vel_mean_filter = SumTreeSMA::<f64, f64, AVG_SAMPLES>::from_zero(0.0);
-    let mut vel_mean: f64 = 0.0;
-
-    let mut pos_mean_filter = SumTreeSMA::<f64, f64, AVG_SAMPLES>::from_zero(0.0);
-    let mut pos_mean: f64 = 0.0;
-
     loop {
         let mut ta = Instant::now();
         loop {
@@ -165,12 +159,6 @@ fn main() -> io::Result<()> {
                         predicted = predict_step(&kf, &filtered);
                         vert_pos = filtered.x[1];
                         vert_vel = filtered.x[2];
-                        pos_mean_filter.add_sample(vert_pos);
-                        vel_mean_filter.add_sample(vert_vel);
-                        if acc_mean_filter.get_num_samples() == AVG_SAMPLES {
-                            vel_mean =  vel_mean_filter.get_average();
-                            pos_mean =  pos_mean_filter.get_average();
-                        }
                     }
 
                     write!(&mut stdout, "accel XYZ     (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", accelerometer[0], accelerometer[1], accelerometer[2])?;
@@ -181,8 +169,8 @@ fn main() -> io::Result<()> {
                     write!(&mut stdout, "accel ref xyz (m/s^2) | {:>8.3} {:>8.3} {:>8.3}\n", rotated_acc[0], rotated_acc[1], rotated_acc[2])?;
                     write!(&mut stdout, "acc_abs       (m/s^2) | {:>8.3} \n", acc_abs)?;
                     write!(&mut stdout, "acc_z/avg     (m/s^2) | {:>8.3} {:>8.3}\n", vert_acc_minus_g - acc_mean, acc_mean)?;
-                    write!(&mut stdout, "vert_vel        (m/s) | {:>8.3} \n", vert_vel - vel_mean)?;
-                    write!(&mut stdout, "vert_pos          (m) | {:>8.3} \n", vert_pos - pos_mean)?;
+                    write!(&mut stdout, "vert_vel        (m/s) | {:>8.3} \n", vert_vel)?;
+                    write!(&mut stdout, "vert_pos          (m) | {:>8.3} \n", vert_pos)?;
                     write!(&mut stdout, "uptime       (millis) | {:>8?}                 \n", start.elapsed().as_millis())?;
                     write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
                     stdout.flush()?;
