@@ -40,8 +40,11 @@ while True:
         # print("%f %f %f" % (x,y,z))
         data = imu.getIMUData()
         fusionPose = data["fusionPose"]
+        fusionQPose = data["fusionQPose"]
         accel = data["accel"]
-        print("r: %f p: %f y: %f ax: %f ay: %f az: %f" % (math.degrees(fusionPose[0]),
+        timestamp = data["timestamp"]
+        print("t: %f, r: %f p: %f y: %f ax: %f ay: %f az: %f" % (timestamp,
+                                     math.degrees(fusionPose[0]),
                                      math.degrees(fusionPose[1]),
                                      math.degrees(fusionPose[2]),
                                      accel[0],
