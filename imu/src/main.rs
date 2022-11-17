@@ -1,6 +1,6 @@
 //! Raspberry Pi4 demo
 
-// TODO: fix reading IMU, etc. Not working example!!!
+// TODO: fix reading IMU (timestamps), etc. Not working example!!!
 
 extern crate linux_embedded_hal as hal;
 extern crate mpu9250;
