@@ -181,17 +181,17 @@ fn main() -> io::Result<()> {
                         stdout.flush()?;
                         //write!(&mut stdout, "{}", move_up_csi_sequence(13))?;
 
-                        //let tt = t.elapsed();
+                        let tt = t.elapsed();
                         match Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64).checked_sub(t.elapsed()) {
                             Some(diff) => {
                                 thread::sleep(diff);
-                                //loop_time = tt;
+                                loop_time = tt;
                                 break;
                             },
                             None => {
                                 // will use previous measurements
                                 println!("skipped measurement");
-                                //loop_time = tt;
+                                loop_time = tt;
                                 continue;
                             }
                         }
