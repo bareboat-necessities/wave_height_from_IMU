@@ -124,6 +124,7 @@ fn main() -> io::Result<()> {
             let mut t = Instant::now();
             match mpu9250.all::<[f32; 3]>() {
                 Ok(all ) => {
+                    sample_time = start.elapsed().as_millis();
                     // Obtain sensor values from a source
                     let gyroscope: Vector3<f64> = Vector3::new(all.gyro[0] as f64, all.gyro[1] as f64, all.gyro[2] as f64);
                     let accelerometer: Vector3<f64> = Vector3::new(all.accel[0] as f64, all.accel[1] as f64, all.accel[2] as f64);
@@ -175,7 +176,7 @@ fn main() -> io::Result<()> {
                         write!(&mut stdout, "acc_z/avg     (m/s^2) | {:>8.3} {:>8.3}\n", vert_acc_minus_g - acc_mean, acc_mean)?;
                         write!(&mut stdout, "vert_vel        (m/s) | {:>8.3} \n", vert_vel)?;
                         write!(&mut stdout, "vert_pos          (m) | {:>8.3} \n", vert_pos)?;
-                        write!(&mut stdout, "uptime       (millis) | {:>8?}                 \n", start.elapsed().as_millis())?;
+                        write!(&mut stdout, "timestamp    (millis) | {:>8?}                 \n", sample_time)?;
                         write!(&mut stdout, "time elapsed (micros) | {:>8?}                 \n", t.elapsed().as_micros())?;
                         write!(&mut stdout, "loop time    (micros) | {:>8?}                 \n", loop_time.as_micros())?;
                         stdout.flush()?;
