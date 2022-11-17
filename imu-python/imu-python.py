@@ -37,8 +37,6 @@ print("Recommended Poll Interval: %dmS\n" % poll_interval)
 
 while True:
     if imu.IMURead():
-        # x, y, z = imu.getFusionData()
-        # print("%f %f %f" % (x,y,z))
         data = imu.getIMUData()
         fusionPose = data["fusionPose"]
         fusionQPose = data["fusionQPose"]
