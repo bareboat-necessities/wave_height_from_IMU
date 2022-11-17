@@ -119,8 +119,8 @@ fn main() -> io::Result<()> {
 
     loop {
         let mut ta = Instant::now();
+        let mut loop_time = ta.elapsed();
         loop {
-            let mut loop_time = ta.elapsed();
             let t = Instant::now();
             match mpu9250.all::<[f32; 3]>() {
                 Ok(all ) => {
@@ -184,13 +184,13 @@ fn main() -> io::Result<()> {
                         match Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64).checked_sub(t.elapsed()) {
                             Some(diff) => {
                                 thread::sleep(diff);
-                                ta = Instant::now();
+                                loop_time = t.elapsed();
                                 break;
                             },
                             None => {
                                 // will use previous measurements
                                 println!("skipped measurement");
-                                ta = Instant::now();
+                                loop_time = t.elapsed();
                                 continue;
                             }
                         }
