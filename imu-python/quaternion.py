@@ -7,8 +7,8 @@
 # License as published by the Free Software Foundation; either
 # version 3 of the License, or (at your option) any later version.
 
-from pypilot import vector
-import math
+import math, vector
+
 
 def angvec2quat(angle, v):
     n = vector.norm(v)
@@ -32,12 +32,12 @@ def vec2vec2quat(a, b):
     ang = math.acos(fac)
     return angvec2quat(ang, n)
 
-def multiply(q1, q2):
-    return [q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3], \
-            q1[0]*q2[1] + q1[1]*q2[0] + q1[2]*q2[3] - q1[3]*q2[2], \
-            q1[0]*q2[2] - q1[1]*q2[3] + q1[2]*q2[0] + q1[3]*q2[1], \
-            q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] + q1[3]*q2[0]]
 
+def multiply(q1, q2):
+    return [q1[0]*q2[0] - q1[1]*q2[1] - q1[2]*q2[2] - q1[3]*q2[3],
+            q1[0]*q2[1] + q1[1]*q2[0] + q1[2]*q2[3] - q1[3]*q2[2],
+            q1[0]*q2[2] - q1[1]*q2[3] + q1[2]*q2[0] + q1[3]*q2[1],
+            q1[0]*q2[3] + q1[1]*q2[2] - q1[2]*q2[1] + q1[3]*q2[0]]
 
 
 # take a vector and quaternion, and rotate the vector by the quaternion
@@ -45,6 +45,7 @@ def rotvecquat(v, q):
     w = [0, v[0], v[1], v[2]]
     r = [q[0], -q[1], -q[2], -q[3]]
     return multiply(multiply(q, w), r)[1:]
+
 
 def toeuler(q):
     roll = math.atan2(2.0 * (q[2] * q[3] + q[0] * q[1]), \
@@ -54,8 +55,10 @@ def toeuler(q):
                          1 - 2.0 * (q[2] * q[2] + q[3] * q[3]))
     return roll, pitch, heading
 
+
 def conjugate(q):
     return [q[0], -q[1], -q[2], -q[3]]
+
 
 def normalize(q):
     total = 0
