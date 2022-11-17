@@ -57,7 +57,8 @@ fn main() -> io::Result<()> {
     let stdout = io::stdout();
     let mut stdout = stdout.lock();
 
-    const IMU_SAMPLE_SEC: f64 = 0.02;
+    const IMU_SAMPLE_SEC: f64 = 0.01;
+    const IMU_POLLING_SEC: f64 = 0.004;
     const ACC_SAMPLE_PERIOD_SEC: f64 = IMU_SAMPLE_SEC * 1.0;
     const ACC_AVG_PERIOD_SEC: f64 = 45.0;
     const WARMUP_PERIOD_SEC: f64 = 50.0;
@@ -175,9 +176,7 @@ fn main() -> io::Result<()> {
                     stdout.flush()?;
                     write!(&mut stdout, "{}", move_up_csi_sequence(12))?;
 
-                    // TODO: Panics!!!
-                    thread::sleep(Duration::from_micros((IMU_SAMPLE_SEC * 1000000.0) as u64)
-                        .checked_sub(t.elapsed()).expect("Err time subtract"));
+                    thread::sleep(Duration::from_micros((IMU_POLLING_SEC * 1000000.0) as u64));
                 }
                 Err(err) => {
                     println!("{:>?}", err)
