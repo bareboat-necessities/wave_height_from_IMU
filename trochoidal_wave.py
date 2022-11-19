@@ -35,7 +35,7 @@ a_max_est = g * np.exp(b * 2 * np.pi / L) / (1 + 7./3. * np.exp(b * 2 * np.pi / 
 # L_source - wave length (m)
 #L_source = (np.sign(delta_v) * np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
 
-print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}')
+print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}, B: {b}')
 
 dt = 0.01
 n_timesteps = int(20 * T / dt)
@@ -121,18 +121,18 @@ b_from_min_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / ((5.
 b_from_max_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / (g - (7.0 * low_pass_filtered_max_a / 3.0)))
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source1) * L_source1 / 2 / np.pi
-print(f'H_from_min_a upwind (m): {H_from_min_a:,.4f}')
+print(f'H_from_min_a upwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
 H_from_max_a = np.exp(2 * np.pi * b_from_max_a / L_source1) * L_source1 / 2 / np.pi
-print(f'H_from_max_a upwind (m): {H_from_max_a:,.4f}')
+print(f'H_from_max_a upwind (m): {H_from_max_a:,.4f}  b_from_max_a={b_from_max_a:,.4f}')
 
 
 b_from_min_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / ((5.0 * low_pass_filtered_min_a / 3.0) - g))
 b_from_max_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / (g - (7.0 * low_pass_filtered_max_a / 3.0)))
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source2) * L_source2 / 2 / np.pi
-print(f'H_from_min_a downwind (m): {H_from_min_a:,.4f}')
+print(f'H_from_min_a downwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
 H_from_max_a = np.exp(2 * np.pi * b_from_max_a / L_source2) * L_source2 / 2 / np.pi
-print(f'H_from_max_a downwind (m): {H_from_max_a:,.4f}')
+print(f'H_from_max_a downwind (m): {H_from_max_a:,.4f}  b_from_max_a={b_from_max_a:,.4f}')
 
 
 f, axarr = plt.subplots(4)
