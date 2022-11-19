@@ -3,6 +3,8 @@ from scipy import linalg
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 
+# https://en.wikipedia.org/wiki/Wind_wave
+
 g = 9.806  # Gravitational G (m/s^2)
 
 b = -1.5  # Rotation center in Y axis (m)
