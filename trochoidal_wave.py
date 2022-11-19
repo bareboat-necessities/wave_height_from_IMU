@@ -125,6 +125,10 @@ print(f'H_from_min_a upwind (m): {H_from_min_a:,.4f}')
 H_from_max_a = np.exp(2 * np.pi * b_from_max_a / L_source1) * L_source1 / 2 / np.pi
 print(f'H_from_max_a upwind (m): {H_from_max_a:,.4f}')
 
+
+b_from_min_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / ((5.0 * low_pass_filtered_min_a / 3.0) - g))
+b_from_max_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / (g - (7.0 * low_pass_filtered_max_a / 3.0)))
+
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source2) * L_source2 / 2 / np.pi
 print(f'H_from_min_a downwind (m): {H_from_min_a:,.4f}')
 H_from_max_a = np.exp(2 * np.pi * b_from_max_a / L_source2) * L_source2 / 2 / np.pi
