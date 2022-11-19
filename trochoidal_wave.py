@@ -32,7 +32,7 @@ a_max_est = g * np.exp(b * 2 * np.pi / L) / (1 + 7./3. * np.exp(b * 2 * np.pi / 
 # Doppler effect TODO: double check
 # f_observed - observed frequency (1/s)
 # L_source - wave length (m)
-#L_source = (np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
+#L_source = (np.sign(delta_v) * np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
 
 print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}')
 
