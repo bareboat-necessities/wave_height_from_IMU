@@ -14,6 +14,9 @@ c = np.sqrt(g / k * np.tanh(d * k))  # Speed in X direction  m/s
 H = np.exp(k * b) / k  # Wave height (m)
 T = L / c  # Wave period (s)
 
+# Approx formula to estimate acceleration on top of wave
+a_min_est = - np.exp(b * 2 * np.pi / L) / (1 - 5./3. * np.exp(b * 2 * np.pi / L))
+
 print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}')
 
 dt = 0.01
