@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import linalg
+from scipy import signal
 from scipy import fft
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
@@ -105,6 +106,13 @@ L_source = (- np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_obs
 print(f'L_source downwind (m): {L_source:,.4f}')
 
 
+# Low pass filter (Butterworth)
+sos = signal.butter(2, freq_in_hertz * 8, 'low', fs=SAMPLE_RATE, output='sos')
+low_pass_filtered = signal.sosfilt(sos, accY_val_A)
+
+w_low = fft.rfft(low_pass_filtered)
+freqs_low = fft.rfftfreq(N_SAMP, 1/SAMPLE_RATE)
+
 f, axarr = plt.subplots(4)
 
 axarr[0].plot(x_val, y_val, label="Reference Pos")
@@ -119,10 +127,12 @@ axarr[1].legend()
 
 axarr[2].plot(x_val, accY_val, label="Reference Vertical Accel")
 axarr[2].plot(time_val, accY_val_A, label="Reference Vertical Accel Extrap")
+axarr[2].plot(time_val, low_pass_filtered, label="Low Pass Filtered Vertical Accel")
 axarr[2].grid()
 axarr[2].legend()
 
 axarr[3].plot(freqs, np.abs(w), label=f'Freq Hz: {freq_in_hertz:,.4f}, Period (s): {period:,.4f}')
+axarr[3].plot(freqs_low, np.abs(w_low), label=f'Low Passed Freq Hz')
 axarr[3].set_xlim([0, 5])
 axarr[3].legend()
 
