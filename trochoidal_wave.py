@@ -89,6 +89,22 @@ freq_in_hertz = abs(freq)
 period = 1/freq_in_hertz
 print(freq_in_hertz, 1/freq_in_hertz)
 
+# Doppler effect
+upwind_speed = 2.0  # m/s
+f_observed = (1 + upwind_speed / c) * freq_in_hertz
+print(f'observed_freq upwind (Hz): {f_observed:,.4f}')
+delta_v = upwind_speed
+L_source = (np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
+print(f'L_source upwind (m): {L_source:,.4f}')
+
+downwind_speed = - 4  # m/s
+f_observed = (1 + downwind_speed / c) * freq_in_hertz
+print(f'observed_freq downwind (Hz): {f_observed:,.4f}')
+delta_v = downwind_speed
+L_source = (- np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
+print(f'L_source downwind (m): {L_source:,.4f}')
+
+
 f, axarr = plt.subplots(4)
 
 axarr[0].plot(x_val, y_val, label="Reference Pos")
