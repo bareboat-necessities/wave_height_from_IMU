@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import linalg
+from scipy import fft
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 
@@ -67,7 +68,23 @@ for ii in range(interp_steps):
         velY_val_A[ii] = f_velY(t)
         accY_val_A[ii] = f_accY(t)
 
-f, axarr = plt.subplots(3, sharex=True)
+
+# Finding frequency
+
+SAMPLE_RATE = 1.0 / dt
+N_SAMP = interp_steps
+
+w = fft.rfft(accY_val_A)
+freqs = fft.rfftfreq(N_SAMP, 1/SAMPLE_RATE)
+
+# Find the peak in the coefficients
+idx = np.argmax(np.abs(w))
+freq = freqs[idx]
+freq_in_hertz = abs(freq)
+period = 1/freq_in_hertz
+print(freq_in_hertz, 1/freq_in_hertz)
+
+f, axarr = plt.subplots(4)
 
 axarr[0].plot(x_val, y_val, label="Reference Pos")
 axarr[0].plot(time_val, y_val_A, label="Reference Pos Extrap")
@@ -83,6 +100,10 @@ axarr[2].plot(x_val, accY_val, label="Reference Vertical Accel")
 axarr[2].plot(time_val, accY_val_A, label="Reference Vertical Accel Extrap")
 axarr[2].grid()
 axarr[2].legend()
+
+axarr[3].plot(freqs, np.abs(w), label=f'Freq Hz: {freq_in_hertz:,.4f}, Period (s): {period:,.4f}')
+axarr[3].set_xlim([0, 5])
+axarr[3].legend()
 
 file = open("trochoidal_wave.txt", "w+")
 for ii in range(interp_steps):
