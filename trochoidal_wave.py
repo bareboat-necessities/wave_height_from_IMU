@@ -15,9 +15,9 @@ H = np.exp(k * b) / k  # Wave height (m)
 T = L / c  # Wave period (s)
 
 # Approx formula to estimate acceleration on top of wave
-a_min_est = - np.exp(b * 2 * np.pi / L) / (1 - 5./3. * np.exp(b * 2 * np.pi / L))
+a_min_est = - g * np.exp(b * 2 * np.pi / L) / (1 - 5./3. * np.exp(b * 2 * np.pi / L))
 # or (reverse)
-# b_est = (L / (2 * np.pi)) * np.log(a_min / ((5.0 * a_min / 3.0) - 1)
+# b_est = (L / (2 * np.pi)) * np.log(a_min / ((5.0 * a_min / 3.0) - g)
 
 print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}')
 
