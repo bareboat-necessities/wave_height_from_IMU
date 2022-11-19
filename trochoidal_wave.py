@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 g = 9.806  # Gravitational G (m/s^2)
 
-b = -1.5  # Rotation center in Y axis (m)
+b = -2  # Rotation center in Y axis (m)
 L = 15    # Wave length (m)
 d = 300   # Depth (m)
 
@@ -19,13 +19,13 @@ H = np.exp(k * b) / k  # Wave height (m)
 T = L / c  # Wave period (s)
 
 # Approx formula to estimate vertical acceleration on top of wave
-a_min_est = - g * np.exp(b * 2 * np.pi / L) / (1 - 5./3. * np.exp(b * 2 * np.pi / L))
+a_min_est = - g * np.exp(b * 2 * np.pi / L) / (1 - 1.6 * np.exp(b * 2 * np.pi / L))
 # bottom of wave
-a_max_est = g * np.exp(b * 2 * np.pi / L) / (1 + 7./3. * np.exp(b * 2 * np.pi / L))
+a_max_est = g * np.exp(b * 2 * np.pi / L) / (1 + 2.1 * np.exp(b * 2 * np.pi / L))
 
 # or (reverse)
-# b_est = (L / (2 * np.pi)) * np.log(a_min / ((5.0 * a_min / 3.0) - g))
-# b_est = (L / (2 * np.pi)) * np.log(a_max / (g - (7.0 * a_max / 3.0)))
+# b_est = (L / (2 * np.pi)) * np.log(a_min / ((1.6 * a_min) - g))
+# b_est = (L / (2 * np.pi)) * np.log(a_max / (g - (2.1 * a_max)))
 
 # Also
 # L = g * T * T / (2 * np.pi) if depth is infinite
@@ -92,14 +92,14 @@ print(freq_in_hertz, 1/freq_in_hertz)
 
 # Doppler effect
 upwind_speed = 2.0  # m/s
-f_observed = (1 + upwind_speed / c) * freq_in_hertz
+f_observed = (1 + upwind_speed / c) * (1/T)
 print(f'observed_freq upwind (Hz): {f_observed:,.4f}')
 delta_v = upwind_speed
 L_source1 = (np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
 print(f'L_source upwind (m): {L_source1:,.4f}')
 
 downwind_speed = - 4  # m/s
-f_observed = (1 + downwind_speed / c) * freq_in_hertz
+f_observed = (1 + downwind_speed / c)  * (1/T)
 print(f'observed_freq downwind (Hz): {f_observed:,.4f}')
 delta_v = downwind_speed
 L_source2 = (- np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
@@ -117,23 +117,25 @@ freqs_low = fft.rfftfreq(N_SAMP, 1/SAMPLE_RATE)
 low_pass_filtered_min_a = min(low_pass_filtered)
 low_pass_filtered_max_a = max(low_pass_filtered)
 
-b_from_min_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / ((5.0 * low_pass_filtered_min_a / 3.0) - g))
-b_from_max_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / (g - (7.0 * low_pass_filtered_max_a / 3.0)))
+b_from_min_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / ((1.6 * low_pass_filtered_min_a) - g))
+b_from_max_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / (g - (2.1 * low_pass_filtered_max_a)))
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source1) * L_source1 / 2 / np.pi
 print(f'H_from_min_a upwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
 H_from_max_a = np.exp(2 * np.pi * b_from_max_a / L_source1) * L_source1 / 2 / np.pi
 print(f'H_from_max_a upwind (m): {H_from_max_a:,.4f}  b_from_max_a={b_from_max_a:,.4f}')
+H_avg = (H_from_min_a + H_from_max_a) / 2
+print(f'H_avg downwind (m): {H_avg:,.4f}')
 
-
-b_from_min_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / ((5.0 * low_pass_filtered_min_a / 3.0) - g))
-b_from_max_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / (g - (7.0 * low_pass_filtered_max_a / 3.0)))
+b_from_min_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / ((1.6 * low_pass_filtered_min_a) - g))
+b_from_max_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / (g - (2.1 * low_pass_filtered_max_a)))
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source2) * L_source2 / 2 / np.pi
 print(f'H_from_min_a downwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
 H_from_max_a = np.exp(2 * np.pi * b_from_max_a / L_source2) * L_source2 / 2 / np.pi
 print(f'H_from_max_a downwind (m): {H_from_max_a:,.4f}  b_from_max_a={b_from_max_a:,.4f}')
-
+H_avg = (H_from_min_a + H_from_max_a) / 2
+print(f'H_avg downwind (m): {H_avg:,.4f}')
 
 f, axarr = plt.subplots(4)
 
