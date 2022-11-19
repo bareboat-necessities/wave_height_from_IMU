@@ -17,7 +17,7 @@ c = np.sqrt(g / k * np.tanh(d * k))  # Speed in X direction  m/s
 H = np.exp(k * b) / k  # Wave height (m)
 T = L / c  # Wave period (s)
 
-# Approx formula to estimate acceleration on top of wave
+# Approx formula to estimate vertical acceleration on top of wave
 a_min_est = - g * np.exp(b * 2 * np.pi / L) / (1 - 5./3. * np.exp(b * 2 * np.pi / L))
 # bottom of wave
 a_max_est = g * np.exp(b * 2 * np.pi / L) / (1 + 7./3. * np.exp(b * 2 * np.pi / L))
