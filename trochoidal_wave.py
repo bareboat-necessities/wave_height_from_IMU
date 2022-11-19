@@ -26,7 +26,7 @@ a_max_est = g * np.exp(b * 2 * np.pi / L) / (1 + 7./3. * np.exp(b * 2 * np.pi / 
 # b_est = (L / (2 * np.pi)) * np.log(a_max / (g - (7.0 * a_max / 3.0)))
 
 # Also
-# L = g * T * T / (2 * np.pi)
+# L = g * T * T / (2 * np.pi) if depth is infinite
 
 print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}')
 
