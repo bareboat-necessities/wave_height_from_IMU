@@ -95,15 +95,15 @@ upwind_speed = 2.0  # m/s
 f_observed = (1 + upwind_speed / c) * freq_in_hertz
 print(f'observed_freq upwind (Hz): {f_observed:,.4f}')
 delta_v = upwind_speed
-L_source = (np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
-print(f'L_source upwind (m): {L_source:,.4f}')
+L_source1 = (np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
+print(f'L_source upwind (m): {L_source1:,.4f}')
 
 downwind_speed = - 4  # m/s
 f_observed = (1 + downwind_speed / c) * freq_in_hertz
 print(f'observed_freq downwind (Hz): {f_observed:,.4f}')
 delta_v = downwind_speed
-L_source = (- np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
-print(f'L_source downwind (m): {L_source:,.4f}')
+L_source2 = (- np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
+print(f'L_source downwind (m): {L_source2:,.4f}')
 
 
 # Low pass filter (Butterworth)
@@ -112,6 +112,24 @@ low_pass_filtered = signal.sosfilt(sos, accY_val_A)
 
 w_low = fft.rfft(low_pass_filtered)
 freqs_low = fft.rfftfreq(N_SAMP, 1/SAMPLE_RATE)
+
+# Calc min/max accel
+low_pass_filtered_min_a = min(low_pass_filtered)
+low_pass_filtered_max_a = max(low_pass_filtered)
+
+b_from_min_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / ((5.0 * low_pass_filtered_min_a / 3.0) - g))
+b_from_max_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / (g - (7.0 * low_pass_filtered_max_a / 3.0)))
+
+H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source1) * L_source1 / 2 / np.pi
+print(f'H_from_min_a upwind (m): {H_from_min_a:,.4f}')
+H_from_max_a = np.exp(2 * np.pi * b_from_max_a / L_source1) * L_source1 / 2 / np.pi
+print(f'H_from_max_a upwind (m): {H_from_max_a:,.4f}')
+
+H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source2) * L_source2 / 2 / np.pi
+print(f'H_from_min_a downwind (m): {H_from_min_a:,.4f}')
+H_from_max_a = np.exp(2 * np.pi * b_from_max_a / L_source2) * L_source2 / 2 / np.pi
+print(f'H_from_max_a downwind (m): {H_from_max_a:,.4f}')
+
 
 f, axarr = plt.subplots(4)
 
