@@ -107,7 +107,7 @@ L_source2 = (- np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_ob
 print(f'L_source downwind (m): {L_source2:,.4f}')
 
 
-# TWA, SWT empirical formulas
+# leeway empirical formula
 heel = 15.0  # (deg)
 SPD = 5.0  # speed through water (kt)
 K = 10.0  # boat and load specific constant (kt^2), about 10.0
