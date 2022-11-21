@@ -111,7 +111,7 @@ print(f'L_source downwind (m): {L_source2:,.4f}')
 heel = 15.0  # (deg)
 SPD = 5.0  # speed through water (kt)
 K = 10.0  # boat and load specific constant (kt^2), about 10.0
-leeway = heel * K / (SPD ** 2)  # leeway - (deg)
+leeway = heel * K / (SPD ** 2)  # leeway - (deg) angle to adjust heading to maintain constant COG (assuming no current)
 
 #
 # AWS = Apparent Wind Speed (relative to the boat heading)
@@ -127,7 +127,7 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 # HDM = Heading magnetic (relative to magnetic north)
 #
 # DFT = Current Drift (speed of current, relative to fixed earth)
-# SET = Current Set (direction current flows toward, relative to fixed earth true north)
+# SET = Current Set (direction current flows toward relative to fixed earth true north)
 #
 # SOG = Speed Over Ground (relative to the fixed earth)
 # COGT = Course Over Ground true (relative to the fixed earth true north)
