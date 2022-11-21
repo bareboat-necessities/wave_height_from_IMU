@@ -7,10 +7,10 @@ import matplotlib.pyplot as plt
 
 g = 9.81  # Gravitational G (m/s^2)
 
-n1_iter = 20
-n2_iter = 15
-db = 0.02
-dL = 20.0
+n1_iter = 10
+n2_iter = 20
+db = 0.01
+dL = 40.0
 
 L_arr = np.zeros(n1_iter * n2_iter)
 H_arr = np.zeros(n1_iter * n2_iter)
@@ -28,7 +28,7 @@ iii = 0
 for n1 in range(n1_iter):
     for n2 in range(n2_iter):
         L = dL*(n1+1)    # Wave length (m)
-        b = -db*L*(n2+8)  # Rotation center in Y axis (m)
+        b = -db*L*(n2+10)  # Rotation center in Y axis (m)
         d = 8000   # Depth (m)
 
         k = 2 * np.pi / L  # Wave number (1/m)
