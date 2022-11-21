@@ -90,7 +90,7 @@ period = 1 / freq_in_hertz
 print(freq_in_hertz, 1 / freq_in_hertz)
 
 # Doppler effect
-upwind_speed = 2.0  # m/s (relative to waves direction, STW * cos(TWA))
+upwind_speed = 2.0  # m/s (relative to waves direction, SPD * cos(TWA))
 f_observed = (1 + upwind_speed / c) * (1 / T)
 print(f'observed_freq upwind (Hz): {f_observed:,.4f}')
 delta_v = upwind_speed
@@ -98,7 +98,7 @@ L_source1 = (np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_obse
             4 * np.pi * (f_observed ** 2))
 print(f'L_source upwind (m): {L_source1:,.4f}')
 
-downwind_speed = - 4  # m/s (relative to waves direction, STW * cos(TWA))
+downwind_speed = - 4  # m/s (relative to waves direction, SPD * cos(TWA))
 f_observed = (1 + downwind_speed / c) * (1 / T)
 print(f'observed_freq downwind (Hz): {f_observed:,.4f}')
 delta_v = downwind_speed
