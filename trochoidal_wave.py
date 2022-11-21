@@ -123,13 +123,15 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 # AGWD = Apparent Ground Wind Direction (relative to true north)
 #
 # SPD = Knotmeter speed (relative to the water)
-# HDT = Heading (relative to true north)
+# HDT = Heading true (relative to true north)
+# HDM = Heading magnetic (relative to magnetic north)
 #
 # DFT = Current Drift (speed of current, relative to fixed earth)
 # SET = Current Set (direction current flows toward, relative to fixed earth true north)
 #
 # SOG = Speed Over Ground (relative to the fixed earth)
-# COG = Course Over Ground (relative to the fixed earth)
+# COGT = Course Over Ground true (relative to the fixed earth true north)
+# COGM = Course Over Ground magnetic (relative to the fixed earth magnetic north)
 #
 # GWS = Ground Wind Speed (relative to the fixed earth)
 # GWD = Ground Wind Direction (relative to true north)
