@@ -146,6 +146,8 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 # GWS = SQRT ( u*u + v*v )
 #
 # GWD = ATAN ( u / v )
+#
+# There are other factors, boat heel, mast twist, upwash from the sails, wind shear
 
 # Low pass filter (Butterworth)
 sos = signal.butter(2, freq_in_hertz * 8, 'low', fs=SAMPLE_RATE, output='sos')
