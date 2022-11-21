@@ -109,7 +109,7 @@ print(f'L_source downwind (m): {L_source2:,.4f}')
 
 # TWA, SWT empirical formulas
 heel = 15.0  # (deg)
-SPD = 5.0  # speed through water (kt) (another abbreviation in SWT)
+SPD = 5.0  # speed through water (kt)
 K = 10.0  # boat and load specific constant (kt^2), about 10.0
 leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 
@@ -134,6 +134,7 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 # GWS = Ground Wind Speed (relative to the fixed earth)
 # GWD = Ground Wind Direction (relative to true north)
 #
+# TWA = True Wind Angle (relative to the heading, 0 = upwind, 180deg = downwind)
 # TWS = True Wind Speed (relative to the water)
 # TWD = True Wind Direction (relative to true north)
 #
@@ -146,6 +147,13 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 # GWS = SQRT ( u*u + v*v )
 #
 # GWD = ATAN ( u / v )
+#
+
+AWS = sqrt(TWS ** 2 + SPD ** 2 + 2 * TWS * SPD * cos(TWA))
+
+AWA = arccos((TWS * cos(TWA) + SPD) / AWS)
+
+
 #
 # There are other factors, boat heel, mast twist, upwash from the sails, wind shear
 
