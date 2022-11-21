@@ -154,12 +154,6 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg) angle to adjust heading to main
 # GWD = ATAN ( u / v )
 #
 #
-# From true to apparent:
-#
-# AWS = sqrt(TWS ** 2 + SPD ** 2 + 2 * TWS * SPD * cos(TWA))
-#
-# AWA = arccos((TWS * cos(TWA) + SPD) / AWS)
-#
 # From apparent to true:
 #
 # TWS = sqrt(AWS ** 2 + SPD ** 2 - 2 * AWS * SPD * cos(AWA))
