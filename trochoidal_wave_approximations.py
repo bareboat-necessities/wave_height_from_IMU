@@ -27,16 +27,16 @@ H_est2_arr = np.zeros(n1_iter * n2_iter)
 iii = 0
 for n1 in range(n1_iter):
     for n2 in range(n2_iter):
-        L = dL*(n1+1)    # Wave length (m)
-        b = -db*L*(n2+10)  # Rotation center in Y axis (m)
-        d = 8000   # Depth (m)
+        L = dL * (n1 + 1)  # Wave length (m)
+        b = -db * L * (n2 + 10)  # Rotation center in Y axis (m)
+        d = 8000  # Depth (m)
 
         k = 2 * np.pi / L  # Wave number (1/m)
         c = np.sqrt(g / k * np.tanh(d * k))  # Speed in X direction  m/s
         H = np.exp(k * b) / k  # Wave height (m)
         T = L / c  # Wave period (s)
 
-        #print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}')
+        # print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}')
 
         dt = 0.01
         n_timesteps = int(2 * T / dt)
@@ -93,7 +93,8 @@ for n1 in range(n1_iter):
         H_est1_arr[iii] = H_est1
         H_est2_arr[iii] = H_est2
 
-        print(f'L={L:,.8f} H={H:,.8f} T={T:,.8f} b={b:,.8f} min_a={min_a:,.8f} max_a={max_a:,.8f} a_min_est={a_min_est:,.8f} a_max_est={a_max_est:,.8f}')
+        print(
+            f'L={L:,.8f} H={H:,.8f} T={T:,.8f} b={b:,.8f} min_a={min_a:,.8f} max_a={max_a:,.8f} a_min_est={a_min_est:,.8f} a_max_est={a_max_est:,.8f}')
         iii = iii + 1
 
 fig = plt.figure(figsize=plt.figaspect(0.5))

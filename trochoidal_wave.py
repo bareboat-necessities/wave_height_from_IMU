@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 g = 9.806  # Gravitational G (m/s^2)
 
 b = -2  # Rotation center in Y axis (m)
-L = 15    # Wave length (m)
-d = 300   # Depth (m)
+L = 15  # Wave length (m)
+d = 300  # Depth (m)
 
 k = 2 * np.pi / L  # Wave number (1/m)
 c = np.sqrt(g / k * np.tanh(d * k))  # Speed in X direction  m/s
@@ -33,7 +33,7 @@ a_max_est = g * np.exp(b * 2 * np.pi / L) / (1 + 2.1 * np.exp(b * 2 * np.pi / L)
 # Doppler effect
 # f_observed - observed frequency (1/s)
 # L_source - wave length (m)
-#L_source = (np.sign(delta_v) * np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
+# L_source = (np.sign(delta_v) * np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
 
 print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}, B: {b}')
 
@@ -74,44 +74,44 @@ for ii in range(interp_steps):
         velY_val_A[ii] = f_velY(t)
         accY_val_A[ii] = f_accY(t)
 
-
 # Finding frequency
 
 SAMPLE_RATE = 1.0 / dt
 N_SAMP = interp_steps
 
 w = fft.rfft(accY_val_A)
-freqs = fft.rfftfreq(N_SAMP, 1/SAMPLE_RATE)
+freqs = fft.rfftfreq(N_SAMP, 1 / SAMPLE_RATE)
 
 # Find the peak in the coefficients
 idx = np.argmax(np.abs(w))
 freq = freqs[idx]
 freq_in_hertz = abs(freq)
-period = 1/freq_in_hertz
-print(freq_in_hertz, 1/freq_in_hertz)
+period = 1 / freq_in_hertz
+print(freq_in_hertz, 1 / freq_in_hertz)
 
 # Doppler effect
 upwind_speed = 2.0  # m/s
-f_observed = (1 + upwind_speed / c) * (1/T)
+f_observed = (1 + upwind_speed / c) * (1 / T)
 print(f'observed_freq upwind (Hz): {f_observed:,.4f}')
 delta_v = upwind_speed
-L_source1 = (np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
+L_source1 = (np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (
+            4 * np.pi * (f_observed ** 2))
 print(f'L_source upwind (m): {L_source1:,.4f}')
 
 downwind_speed = - 4  # m/s
-f_observed = (1 + downwind_speed / c)  * (1/T)
+f_observed = (1 + downwind_speed / c) * (1 / T)
 print(f'observed_freq downwind (Hz): {f_observed:,.4f}')
 delta_v = downwind_speed
-L_source2 = (- np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
+L_source2 = (- np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (
+            4 * np.pi * (f_observed ** 2))
 print(f'L_source downwind (m): {L_source2:,.4f}')
-
 
 # Low pass filter (Butterworth)
 sos = signal.butter(2, freq_in_hertz * 8, 'low', fs=SAMPLE_RATE, output='sos')
 low_pass_filtered = signal.sosfilt(sos, accY_val_A)
 
 w_low = fft.rfft(low_pass_filtered)
-freqs_low = fft.rfftfreq(N_SAMP, 1/SAMPLE_RATE)
+freqs_low = fft.rfftfreq(N_SAMP, 1 / SAMPLE_RATE)
 
 # Calc min/max accel
 low_pass_filtered_min_a = min(low_pass_filtered)
