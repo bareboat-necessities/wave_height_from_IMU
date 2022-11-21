@@ -148,12 +148,22 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 #
 # GWD = ATAN ( u / v )
 #
-
-AWS = sqrt(TWS ** 2 + SPD ** 2 + 2 * TWS * SPD * cos(TWA))
-
-AWA = arccos((TWS * cos(TWA) + SPD) / AWS)
-
-
+#
+# From true to apparent:
+#
+# AWS = sqrt(TWS ** 2 + SPD ** 2 + 2 * TWS * SPD * cos(TWA))
+#
+# AWA = arccos((TWS * cos(TWA) + SPD) / AWS)
+#
+# From apparent to true:
+#
+# TWS = sqrt(AWS ** 2 + SPD ** 2 - 2 * AWS * SPD * cos(AWA))
+#
+# for starboard:
+# TWA = arccos((AWS * cos(AWA) - SPD) / TWS)
+#
+# for port:
+# TWA = - arccos((AWS * cos(AWA) - SPD) / TWS)
 #
 # There are other factors, boat heel, mast twist, upwash from the sails, wind shear
 
