@@ -140,6 +140,9 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg) angle to adjust heading to main
 # TWS = True Wind Speed (relative to the water)
 # TWD = True Wind Direction (relative to true north)
 #
+# POS = position LAT, LON (latitude, longitude)
+# TB(POS1, POS2) = Bearing true (true north angle to maintain in course to reach from POS1 to POS2)
+#
 # AWA = + for Starboard, – for Port
 # AWD = H + AWA ( 0 < AWD < 360 )
 #
