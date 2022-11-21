@@ -109,20 +109,20 @@ print(f'L_source downwind (m): {L_source2:,.4f}')
 
 # TWA, SWT empirical formulas
 heel = 15.0  # (deg)
-SWT = 5.0  # speed through water (kt) (another abbreviation in SPD)
+SPD = 5.0  # speed through water (kt) (another abbreviation in SWT)
 K = 10.0  # boat and load specific constant (kt^2), about 10.0
-leeway = heel * K / (SWT ** 2)  # leeway - (deg)
+leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 
 #
-# AWS = Apparent Wind Speed (relative to the boat)
-# AWA = Apparent Wind Angle (relative to the bow, 0 to 180, starboard plus, port minus)
+# AWS = Apparent Wind Speed (relative to the boat heading)
+# AWA = Apparent Wind Angle (relative to the bow heading, 0 to 180, starboard plus, port minus)
 # AWD = Apparent Wind Direction (relative to true north)
 #
-# S = Knotmeter speed (relative to the water)
-# H = Heading (relative to true north)
+# SPD = Knotmeter speed (relative to the water)
+# HDT = Heading (relative to true north)
 #
 # DFT = Current Drift (speed of current, relative to fixed earth)
-# SET = Current Set (direction current flows toward, relative to fixed earth)
+# SET = Current Set (direction current flows toward, relative to fixed earth true north)
 #
 # SOG = Speed Over Ground (relative to the fixed earth)
 # COG = Course Over Ground (relative to the fixed earth)
@@ -136,8 +136,8 @@ leeway = heel * K / (SWT ** 2)  # leeway - (deg)
 # AWA = + for Starboard, – for Port
 # AWD = H + AWA ( 0 < AWD < 360 )
 #
-# u = SOG * Sin (COG) – AWS * Sin (AWD)
-# v = SOG * Cos (COG) – AWS * Cos (AWD)
+# u = SOG * Sin (COG) – AWS * Sin (AWD - leeway - TODO: ??? )
+# v = SOG * Cos (COG) – AWS * Cos (AWD - leeway - TODO: ??? )
 #
 # GWS = SQRT ( u*u + v*v )
 #
