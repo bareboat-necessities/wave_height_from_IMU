@@ -106,6 +106,14 @@ L_source2 = (- np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_ob
             4 * np.pi * (f_observed ** 2))
 print(f'L_source downwind (m): {L_source2:,.4f}')
 
+
+# TWA, SWT empirical formulas
+heel = 15.0  # (deg)
+SWT = 5.0  # speed through water (kt)
+K = 10.0  # boat and load specific constant (kt^2), about 10.0
+leeway = heel * K / (SWT ** 2)  # leeway - (deg)
+
+
 # Low pass filter (Butterworth)
 sos = signal.butter(2, freq_in_hertz * 8, 'low', fs=SAMPLE_RATE, output='sos')
 low_pass_filtered = signal.sosfilt(sos, accY_val_A)
