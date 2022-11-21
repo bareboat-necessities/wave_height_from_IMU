@@ -30,7 +30,7 @@ a_max_est = g * np.exp(b * 2 * np.pi / L) / (1 + 2.1 * np.exp(b * 2 * np.pi / L)
 # Also
 # L = g * T * T / (2 * np.pi) if depth is infinite
 
-# Doppler effect TODO: double check
+# Doppler effect
 # f_observed - observed frequency (1/s)
 # L_source - wave length (m)
 #L_source = (np.sign(delta_v) * np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_observed * np.pi * delta_v + g) / (4 * np.pi * (f_observed ** 2))
