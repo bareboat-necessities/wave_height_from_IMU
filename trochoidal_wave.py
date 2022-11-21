@@ -118,6 +118,10 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 # AWA = Apparent Wind Angle (relative to the bow heading, 0 to 180, starboard plus, port minus)
 # AWD = Apparent Wind Direction (relative to true north)
 #
+# AGWS = Apparent Ground Wind Speed (relative to the boat heading)
+# AGWA = Apparent Ground Wind Angle (relative to the bow heading, 0 to 180, starboard plus, port minus)
+# AGWD = Apparent Ground Wind Direction (relative to true north)
+#
 # SPD = Knotmeter speed (relative to the water)
 # HDT = Heading (relative to true north)
 #
@@ -136,8 +140,8 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 # AWA = + for Starboard, – for Port
 # AWD = H + AWA ( 0 < AWD < 360 )
 #
-# u = SOG * Sin (COG) – AWS * Sin (AWD - leeway - TODO: ??? )
-# v = SOG * Cos (COG) – AWS * Cos (AWD - leeway - TODO: ??? )
+# u = SOG * Sin (COG) – AGWS * Sin (AGWD)
+# v = SOG * Cos (COG) – AGWS * Cos (AGWD)
 #
 # GWS = SQRT ( u*u + v*v )
 #
