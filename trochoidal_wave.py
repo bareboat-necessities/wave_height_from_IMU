@@ -134,7 +134,7 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg)
 # GWS = Ground Wind Speed (relative to the fixed earth)
 # GWD = Ground Wind Direction (relative to true north)
 #
-# TWA = True Wind Angle (relative to the heading, 0 = upwind, 180deg = downwind)
+# TWA = True Wind Angle (relative to the heading, 0 = upwind, 180deg = downwind, (+ starboard, - port))
 # TWS = True Wind Speed (relative to the water)
 # TWD = True Wind Direction (relative to true north)
 #
