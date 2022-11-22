@@ -249,6 +249,7 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg) angle to adjust heading to main
 #  use avg(HDT) vs COG and avg(AWA), AVG(AWS) and SPD to calculate TWS/TWA
 #  avg(leeway(heel(t), SPD))
 #  TWS = sqrt(AVG(AWS) ** 2 + SPD ** 2 - 2 * AVG(AWS) * SPD * cos(avg(AWA) +- (COGT - avg(HDT)))) TODO: ???
+#  TWA = +- arccos((AVG(AWS) * cos(avg(AWA) +- (COGT - avg(HDT))) - SPD) / TWS) TODO: ???
 #  calculate delta_v as SPD * cos(TWA)
 # Calculate L_source (source wave length) for trochoidal wave model from f_observed and delta_v using Doppler formulas
 # Low pass filter for accel data
