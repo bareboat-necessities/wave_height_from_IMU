@@ -245,8 +245,9 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg) angle to adjust heading to main
 # FFT to get observed wave frequency from acceleration (f_observed)
 # Speed toward wave fronts (delta_v for Doppler frequency) from wind and speed data
 #  COGT as true bearing from POS1 to POS2
+#  Use avg(HDT) vs COG and coordinates to calculate SPD
 #  SPD = (DIST(POS1, POS2)/(t_end - t_start) + (DFT * cos(COGT - SET))) * cos(COGT - avg(HDT))
-#  use avg(HDT) vs COG and avg(AWA), AVG(AWS) and SPD to calculate TWS/TWA
+#  use avg(AWA), AVG(AWS) and SPD to calculate TWS/TWA
 #  avg(leeway(heel(t), SPD))
 #  TWS = sqrt(AVG(AWS) ** 2 + SPD ** 2 - 2 * AVG(AWS) * SPD * cos(avg(AWA)))
 #  TWA = +- arccos((AVG(AWS) * cos(avg(AWA)) - SPD) / TWS)
