@@ -156,13 +156,13 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg) angle to adjust heading to main
 #
 # From apparent to true:
 #
-# TWS = sqrt(AWS ** 2 + SPD ** 2 - 2 * AWS * SPD * cos(AWA))
+# TWS = sqrt(AWS ** 2 + SPD ** 2 - 2 * AWS * SPD * cos(AWA - leeway(heel, SPD)))
 #
 # for starboard:
-# TWA = arccos((AWS * cos(AWA) - SPD) / TWS)
+# TWA = arccos((AWS * cos(AWA - leeway(heel, SPD)) - SPD) / TWS)
 #
 # for port:
-# TWA = - arccos((AWS * cos(AWA) - SPD) / TWS)
+# TWA = - arccos((AWS * cos(AWA - leeway(heel, SPD)) - SPD) / TWS)
 #
 # There are other factors, boat heel, mast twist, upwash from the sails, wind shear
 
