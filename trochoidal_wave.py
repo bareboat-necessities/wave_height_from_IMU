@@ -244,7 +244,7 @@ leeway = heel * K / (SPD ** 2)  # leeway - (deg) angle to adjust heading to main
 # Calculation steps:
 # FFT to get observed wave frequency from acceleration (f_observed)
 # Speed toward wave fronts (delta_v for Doppler frequency) from wind and speed data
-#  SPD = DIST(POS1, POS2)/(t_end - t_start) + (head current, current speed projection over COG)
+#  SPD = DIST(POS1, POS2)/(t_end - t_start) + (DFT * cos(COGT - SET))
 #  use avg(HDT) vs COG and avg(AWA), AVG(AWS) and SPD to calculate TWS/TWA
 #  calculate delta_v as SPD * cos(TWA)
 # Calculate L_source (source wave length) for trochoidal wave model from f_observed and delta_v using Doppler formulas
