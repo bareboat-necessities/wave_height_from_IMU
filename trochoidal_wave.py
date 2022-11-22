@@ -106,66 +106,6 @@ L_source2 = (- np.sqrt(8 * f_observed * g * np.pi * delta_v + g ** 2) + 4 * f_ob
             4 * np.pi * (f_observed ** 2))
 print(f'L_source downwind (m): {L_source2:,.4f}')
 
-
-# leeway empirical formula
-heel = 15.0  # (deg)
-SPD = 5.0  # speed through water (kt)
-K = 10.0  # boat and load specific constant (kt^2), about 10.0
-leeway = heel * K / (SPD ** 2)  # leeway - (deg) angle to adjust heading to maintain constant COG (assuming no current)
-
-#
-# AWS = Apparent Wind Speed (relative to the boat heading)
-# AWA = Apparent Wind Angle (relative to the bow heading, 0 to 180, starboard plus, port minus)
-# AWD = Apparent Wind Direction (relative to true north)
-#
-# AGWS = Apparent Ground Wind Speed (relative to the boat course over the ground)
-# AGWA = Apparent Ground Wind Angle (relative to the boat course over the ground, 0 to 180, starboard plus, port minus)
-# AGWD = Apparent Ground Wind Direction (relative to true north)
-#
-# SPD = Knotmeter speed (relative to the water)
-# HDT = Heading true (relative to true north)
-# HDM = Heading magnetic (relative to magnetic north)
-#
-# DFT = Current Drift (speed of current, relative to fixed earth)
-# SET = Current Set (direction current flows toward relative to fixed earth true north)
-#
-# SOG = Speed Over Ground (relative to the fixed earth)
-# COGT = Course Over Ground true (relative to the fixed earth true north)
-# COGM = Course Over Ground magnetic (relative to the fixed earth magnetic north)
-#
-# GWS = Ground Wind Speed (relative to the fixed earth)
-# GWD = Ground Wind Direction (relative to true north)
-#
-# TWA = True Wind Angle (relative to the heading, 0 = upwind, 180deg = downwind, (+ starboard, - port))
-# TWS = True Wind Speed (relative to the water)
-# TWD = True Wind Direction (relative to true north)
-#
-# POS = position LAT, LON (latitude, longitude)
-# TB(POS1, POS2) = Bearing true (true north angle to maintain in course to reach from POS1 to POS2)
-#
-# AWA = + for Starboard, – for Port
-# AWD = H + AWA ( 0 < AWD < 360 )
-#
-# u = SOG * Sin (COG) – AGWS * Sin (AGWD)
-# v = SOG * Cos (COG) – AGWS * Cos (AGWD)
-#
-# GWS = SQRT ( u*u + v*v )
-#
-# GWD = ATAN ( u / v )
-#
-#
-# From apparent to true:
-#
-# TWS = sqrt(AWS ** 2 + SPD ** 2 - 2 * AWS * SPD * cos(AWA - leeway(heel, SPD)))
-#
-# for starboard:
-# TWA = arccos((AWS * cos(AWA - leeway(heel, SPD)) - SPD) / TWS)
-#
-# for port:
-# TWA = - arccos((AWS * cos(AWA - leeway(heel, SPD)) - SPD) / TWS)
-#
-# There are other factors, boat heel, mast twist, upwash from the sails, wind shear
-
 # Low pass filter (Butterworth)
 sos = signal.butter(2, freq_in_hertz * 8, 'low', fs=SAMPLE_RATE, output='sos')
 low_pass_filtered = signal.sosfilt(sos, accY_val_A)
@@ -227,3 +167,87 @@ for ii in range(interp_steps):
 file.close()
 
 plt.show()
+
+# leeway empirical formula
+heel = 15.0  # (deg)
+SPD = 5.0  # speed through water (kt)
+K = 10.0  # boat and load specific constant (kt^2), about 10.0
+leeway = heel * K / (SPD ** 2)  # leeway - (deg) angle to adjust heading to maintain constant COG (assuming no current)
+
+#
+# AWS = Apparent Wind Speed (relative to the boat heading)
+# AWA = Apparent Wind Angle (relative to the bow heading, 0 to 180, starboard plus, port minus)
+# AWD = Apparent Wind Direction (relative to true north)
+#
+# AGWS = Apparent Ground Wind Speed (relative to the boat course over the ground)
+# AGWA = Apparent Ground Wind Angle (relative to the boat course over the ground, 0 to 180, starboard plus, port minus)
+# AGWD = Apparent Ground Wind Direction (relative to true north)
+#
+# SPD = Knotmeter speed (relative to the water)
+# HDT = Heading true (relative to true north)
+# HDM = Heading magnetic (relative to magnetic north)
+#
+# DFT = Current Drift (speed of current, relative to fixed earth)
+# SET = Current Set (direction current flows toward relative to fixed earth true north)
+#
+# SOG = Speed Over Ground (relative to the fixed earth)
+# COGT = Course Over Ground true (relative to the fixed earth true north)
+# COGM = Course Over Ground magnetic (relative to the fixed earth magnetic north)
+#
+# GWS = Ground Wind Speed (relative to the fixed earth)
+# GWD = Ground Wind Direction (relative to true north)
+#
+# TWA = True Wind Angle (relative to the heading, 0 = upwind, 180deg = downwind, (+ starboard, - port))
+# TWS = True Wind Speed (relative to the water)
+# TWD = True Wind Direction (relative to true north)
+#
+# POS = position LAT, LON (latitude, longitude)
+# TB(POS1, POS2) = Bearing true (true north angle to maintain in course to reach from POS1 to POS2)
+#
+# AWA = + for Starboard, – for Port
+# AWD = H + AWA ( 0 < AWD < 360 )
+#
+# u = SOG * Sin (COG) – AGWS * Sin (AGWD)
+# v = SOG * Cos (COG) – AGWS * Cos (AGWD)
+#
+# GWS = SQRT ( u*u + v*v )
+#
+# GWD = ATAN ( u / v )
+#
+#
+# From apparent to true:
+#
+# TWS = sqrt(AWS ** 2 + SPD ** 2 - 2 * AWS * SPD * cos(AWA - leeway(heel, SPD)))
+#
+# for starboard:
+# TWA = arccos((AWS * cos(AWA - leeway(heel, SPD)) - SPD) / TWS)
+#
+# for port:
+# TWA = - arccos((AWS * cos(AWA - leeway(heel, SPD)) - SPD) / TWS)
+#
+# There are other factors, boat heel, mast twist, upwash from the sails, wind shear
+
+
+# Measurable input parameters
+# t_start, t_end - time interval of measurements (about 5 mins)
+# POS(t) as LAT(t), LON(t)
+# AWA(t) AWS(t)
+# COG(t) SOG(t)
+# HDM(t) + mag_variation -> HDT(t)
+# DFT(t) SET(t) - (possibly from current/tide stations harmonics data)
+# heel(t), pitch(t)
+# SPD(t) - possibly (might be missing) => leeway(heel(t), SPD(t))
+# accel(t, x, y, z), vertical_accel(t) via pitch,roll,heel
+# ROT(t) - rate of turn
+
+
+# Calculation steps:
+# FFT to get observed wave frequency from acceleration (f_observed)
+# Speed toward wave fronts (delta_v for Doppler frequency) from wind and speed data TODO: how? using avg(HDT) vs COG, avg(AWA)?
+# Calculate L_source (source wave length) for trochoidal wave model from f_observed and delta_v using Doppler formulas
+# Low pass filter for accel data
+# min/max accel after low pass
+# Calculate b value for trochoidal wave model from known L_source and min/max accel after low pass
+# Calculate wave height from b and L_source
+
+
