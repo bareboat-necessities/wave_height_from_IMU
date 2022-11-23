@@ -7,25 +7,25 @@ import matplotlib.pyplot as plt
 
 # https://en.wikipedia.org/wiki/Wind_wave
 
-g = 9.806  # Gravitational G (m/s^2)
+g = 9.81  # Gravitational G (m/s^2)
 
 b = -2  # Rotation center in Y axis (m)
 L = 15  # Wave length (m)
-d = 300  # Depth (m)
+d = 8000  # Depth (m)
 
 k = 2 * np.pi / L  # Wave number (1/m)
 c = np.sqrt(g / k * np.tanh(d * k))  # Speed in X direction  m/s
 H = np.exp(k * b) / k  # Wave height (m)
 T = L / c  # Wave period (s)
 
-# Approx formula to estimate vertical acceleration on top of wave
-a_min_est = - g * np.exp(b * 2 * np.pi / L) / (1 - 1.6 * np.exp(b * 2 * np.pi / L))
+# formula for  vertical acceleration on top of wave
+a_min_est = g / (np.exp(- b * 2 * np.pi / L) - 1)
 # bottom of wave
-a_max_est = g * np.exp(b * 2 * np.pi / L) / (1 + 2.1 * np.exp(b * 2 * np.pi / L))
+a_max_est = g / (np.exp(- b * 2 * np.pi / L) + 1)
 
 # or (reverse)
-# b_est = (L / (2 * np.pi)) * np.log(a_min / ((1.6 * a_min) - g))
-# b_est = (L / (2 * np.pi)) * np.log(a_max / (g - (2.1 * a_max)))
+# b_est = - (L / (2 * np.pi)) * np.log(g / a_min + 1)
+# b_est = - (L / (2 * np.pi)) * np.log(g / a_max - 1)
 
 # Also
 # L = g * T * T / (2 * np.pi) if depth is infinite
@@ -51,9 +51,8 @@ for ii in range(n_timesteps):
     y = - H * np.cos(k * c * t)
     x_val[ii] = x / c + t
     y_val[ii] = y
-    if ii > 0:
-        velY_val[ii] = (y - y_val[ii - 1]) / (x_val[ii] - x_val[ii - 1])
-        accY_val[ii] = (velY_val[ii] - velY_val[ii - 1]) / (x_val[ii] - x_val[ii - 1])
+    velY_val[ii] = c * H * k * np.sin(k * c * t) / (H * k * np.cos(k * c * t) + 1)
+    accY_val[ii] = (c**2) * H * (k ** 2) * np.cos(k * c * t) / (H * k * np.cos(k * c * t) + 1)
 
 n_off = int(T / dt / 10)
 interp_steps = n_timesteps - 2 * n_off
@@ -73,6 +72,10 @@ for ii in range(interp_steps):
         y_val_A[ii] = f_Y(t)
         velY_val_A[ii] = f_velY(t)
         accY_val_A[ii] = f_accY(t)
+
+max_aa = max(accY_val_A)/g
+print(f'max_a={max_aa:,.4f} g')
+
 
 # Finding frequency
 
@@ -117,8 +120,8 @@ freqs_low = fft.rfftfreq(N_SAMP, 1 / SAMPLE_RATE)
 low_pass_filtered_min_a = min(low_pass_filtered)
 low_pass_filtered_max_a = max(low_pass_filtered)
 
-b_from_min_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / ((1.6 * low_pass_filtered_min_a) - g))
-b_from_max_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / (g - (2.1 * low_pass_filtered_max_a)))
+b_from_min_a = - (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / g + 1)
+b_from_max_a = - (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / g - 1)
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source1) * L_source1 / 2 / np.pi
 print(f'H_from_min_a upwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
@@ -127,8 +130,8 @@ print(f'H_from_max_a upwind (m): {H_from_max_a:,.4f}  b_from_max_a={b_from_max_a
 H_avg = (H_from_min_a + H_from_max_a) / 2
 print(f'H_avg downwind (m): {H_avg:,.4f}')
 
-b_from_min_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / ((1.6 * low_pass_filtered_min_a) - g))
-b_from_max_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / (g - (2.1 * low_pass_filtered_max_a)))
+b_from_min_a = - (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / g + 1)
+b_from_max_a = - (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / g - 1)
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source2) * L_source2 / 2 / np.pi
 print(f'H_from_min_a downwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
