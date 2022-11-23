@@ -2,14 +2,13 @@ import numpy as np
 from scipy import linalg
 from scipy import signal
 from scipy import fft
-from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 
 # https://en.wikipedia.org/wiki/Wind_wave
 
 g = 9.81  # Gravitational G (m/s^2)
 
-b = -2  # Rotation center in Y axis (m)
+b = -3  # Rotation center in Y axis (m)
 L = 15  # Wave length (m)
 d = 8000  # Depth (m)
 
@@ -47,42 +46,17 @@ accY_val = np.zeros(n_timesteps)
 
 for ii in range(n_timesteps):
     t = ii * dt
-    x = H * np.sin(k * c * t)
-    y = - H * np.cos(k * c * t)
-    x_val[ii] = x / c + t
-    y_val[ii] = y
+    x_val[ii] = t
+    y_val[ii] = - np.log (H * k * np.cos(c * k * t) + 1) / k
     velY_val[ii] = c * H * k * np.sin(k * c * t) / (H * k * np.cos(k * c * t) + 1)
     accY_val[ii] = (c**2) * H * (k ** 2) * np.cos(k * c * t) / (H * k * np.cos(k * c * t) + 1)
-
-n_off = int(T / dt / 10)
-interp_steps = n_timesteps - 2 * n_off
-time_val = np.zeros(interp_steps)
-y_val_A = np.zeros(interp_steps)
-velY_val_A = np.zeros(interp_steps)
-accY_val_A = np.zeros(interp_steps)
-
-f_Y = interp1d(x_val, y_val)
-f_velY = interp1d(x_val, velY_val)
-f_accY = interp1d(x_val, accY_val)
-
-for ii in range(interp_steps):
-    t = (ii + n_off) * dt
-    time_val[ii] = t
-    if ii > 0:
-        y_val_A[ii] = f_Y(t)
-        velY_val_A[ii] = f_velY(t)
-        accY_val_A[ii] = f_accY(t)
-
-max_aa = max(accY_val_A)/g
-print(f'max_a={max_aa:,.4f} g')
-
 
 # Finding frequency
 
 SAMPLE_RATE = 1.0 / dt
-N_SAMP = interp_steps
+N_SAMP = n_timesteps
 
-w = fft.rfft(accY_val_A)
+w = fft.rfft(accY_val)
 freqs = fft.rfftfreq(N_SAMP, 1 / SAMPLE_RATE)
 
 # Find the peak in the coefficients
@@ -111,7 +85,7 @@ print(f'L_source downwind (m): {L_source2:,.4f}')
 
 # Low pass filter (Butterworth)
 sos = signal.butter(2, freq_in_hertz * 8, 'low', fs=SAMPLE_RATE, output='sos')
-low_pass_filtered = signal.sosfilt(sos, accY_val_A)
+low_pass_filtered = signal.sosfilt(sos, accY_val)
 
 w_low = fft.rfft(low_pass_filtered)
 freqs_low = fft.rfftfreq(N_SAMP, 1 / SAMPLE_RATE)
@@ -119,6 +93,9 @@ freqs_low = fft.rfftfreq(N_SAMP, 1 / SAMPLE_RATE)
 # Calc min/max accel
 low_pass_filtered_min_a = min(low_pass_filtered)
 low_pass_filtered_max_a = max(low_pass_filtered)
+
+print(f'low_pass_filtered_min_a (m/s^2): {low_pass_filtered_min_a:,.4f}')
+print(f'low_pass_filtered_max_a (m/s^2): {low_pass_filtered_max_a:,.4f}')
 
 b_from_min_a = - (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / g + 1)
 b_from_max_a = - (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / g - 1)
@@ -143,18 +120,17 @@ print(f'H_avg downwind (m): {H_avg:,.4f}')
 f, axarr = plt.subplots(4)
 
 axarr[0].plot(x_val, y_val, label="Reference Pos")
-axarr[0].plot(time_val, y_val_A, label="Reference Pos Extrap")
 axarr[0].grid()
 axarr[0].legend()
 
 axarr[1].plot(x_val, velY_val, label="Reference Vertical Velocity")
-axarr[1].plot(time_val, velY_val_A, label="Reference Vertical Velocity Extrap")
+axarr[1].plot(x_val, velY_val, label="Reference Vertical Velocity Extrap")
 axarr[1].grid()
 axarr[1].legend()
 
 axarr[2].plot(x_val, accY_val, label="Reference Vertical Accel")
-axarr[2].plot(time_val, accY_val_A, label="Reference Vertical Accel Extrap")
-axarr[2].plot(time_val, low_pass_filtered, label="Low Pass Filtered Vertical Accel")
+axarr[2].plot(x_val, accY_val, label="Reference Vertical Accel Extrap")
+axarr[2].plot(x_val, low_pass_filtered, label="Low Pass Filtered Vertical Accel")
 axarr[2].grid()
 axarr[2].legend()
 
@@ -164,9 +140,9 @@ axarr[3].set_xlim([0, 5])
 axarr[3].legend()
 
 file = open("trochoidal_wave.txt", "w+")
-for ii in range(interp_steps):
+for ii in range(n_timesteps):
     if ii > 0:
-        file.write(f'{time_val[ii]:,.4f}, {accY_val_A[ii]:,.8f}, {y_val_A[ii]:,.8f}, {velY_val_A[ii]:,.8f}\n')
+        file.write(f'{x_val[ii]:,.4f}, {accY_val[ii]:,.8f}, {y_val[ii]:,.8f}, {velY_val[ii]:,.8f}\n')
 file.close()
 
 plt.show()
