@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 
 g = 9.81  # Gravitational G (m/s^2)
 
-b = -0.2  # Rotation center in Y axis (m)
+b = -0.4  # Rotation center in Y axis (m)
 L = 15  # Wave length (m)
-d = 8000  # Depth (m)
+d = 30  # Depth (m)
 
 k = 2 * np.pi / L  # Wave number (1/m)
 c = np.sqrt(g / k * np.tanh(d * k))  # Speed in X direction  m/s
@@ -37,7 +37,7 @@ a_max_est = g / (1 + np.exp(- b * 2 * np.pi / L))
 print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}, B: {b}')
 
 dt = 0.01
-n_timesteps = int(4 * T / dt)
+n_timesteps = int(8 * T / dt)
 
 x_val = np.zeros(n_timesteps)
 y_val = np.zeros(n_timesteps)
@@ -91,8 +91,8 @@ w_low = fft.rfft(low_pass_filtered)
 freqs_low = fft.rfftfreq(N_SAMP, 1 / SAMPLE_RATE)
 
 # Calc min/max accel
-low_pass_filtered_min_a = min(accY_val)
-low_pass_filtered_max_a = max(accY_val)
+low_pass_filtered_min_a = min(low_pass_filtered)
+low_pass_filtered_max_a = max(low_pass_filtered)
 
 print(f'low_pass_filtered_min_a (m/s^2): {low_pass_filtered_min_a:,.4f}')
 print(f'low_pass_filtered_max_a (m/s^2): {low_pass_filtered_max_a:,.4f}')
