@@ -20,7 +20,7 @@ T = L / c  # Wave period (s)
 # formula for  vertical acceleration on top of wave
 a_min_est = g / (1 - np.exp(- b * 2 * np.pi / L))
 # bottom of wave
-a_max_est = g / (np.exp(- b * 2 * np.pi / L) - 1)
+a_max_est = g / (np.exp(- b * 2 * np.pi / L) + 1)
 
 # or (reverse)
 # b_est = - (L / (2 * np.pi)) * np.log(1 - g / a_min)
