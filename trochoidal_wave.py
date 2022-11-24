@@ -37,7 +37,7 @@ a_max_est = g / (np.exp(- b * 2 * np.pi / L) + 1)
 print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}, B: {b}')
 
 dt = 0.01
-n_timesteps = int(20 * T / dt)
+n_timesteps = int(4 * T / dt)
 
 x_val = np.zeros(n_timesteps)
 y_val = np.zeros(n_timesteps)
@@ -91,14 +91,14 @@ w_low = fft.rfft(low_pass_filtered)
 freqs_low = fft.rfftfreq(N_SAMP, 1 / SAMPLE_RATE)
 
 # Calc min/max accel
-low_pass_filtered_min_a = min(low_pass_filtered)
-low_pass_filtered_max_a = max(low_pass_filtered)
+low_pass_filtered_min_a = min(accY_val)
+low_pass_filtered_max_a = max(accY_val)
 
 print(f'low_pass_filtered_min_a (m/s^2): {low_pass_filtered_min_a:,.4f}')
 print(f'low_pass_filtered_max_a (m/s^2): {low_pass_filtered_max_a:,.4f}')
 
-b_from_min_a = - (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / g + 1)
-b_from_max_a = - (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / g - 1)
+b_from_min_a = - (L_source1 / (2 * np.pi)) * np.log(g / low_pass_filtered_min_a + 1)
+b_from_max_a = - (L_source1 / (2 * np.pi)) * np.log(g / low_pass_filtered_max_a - 1)
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source1) * L_source1 / 2 / np.pi
 print(f'H_from_min_a upwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
@@ -107,8 +107,8 @@ print(f'H_from_max_a upwind (m): {H_from_max_a:,.4f}  b_from_max_a={b_from_max_a
 H_avg = (H_from_min_a + H_from_max_a) / 2
 print(f'H_avg downwind (m): {H_avg:,.4f}')
 
-b_from_min_a = - (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_min_a / g + 1)
-b_from_max_a = - (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / g - 1)
+b_from_min_a = - (L_source2 / (2 * np.pi)) * np.log(g / low_pass_filtered_min_a + 1)
+b_from_max_a = - (L_source2 / (2 * np.pi)) * np.log(g / low_pass_filtered_max_a - 1)
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source2) * L_source2 / 2 / np.pi
 print(f'H_from_min_a downwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
