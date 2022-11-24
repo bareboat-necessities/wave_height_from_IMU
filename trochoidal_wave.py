@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 
 # https://en.wikipedia.org/wiki/Wind_wave
 
+# More here: https://bareboat-necessities.github.io/my-bareboat/bareboat-math.html
+
 g = 9.81  # Gravitational G (m/s^2)
 
 b = -1  # Rotation center in Y axis (m)
