@@ -20,11 +20,11 @@ T = L / c  # Wave period (s)
 # formula for  vertical acceleration on top of wave
 a_min_est = g / (1 - np.exp(- b * 2 * np.pi / L))
 # bottom of wave
-a_max_est = g / (1 + np.exp(- b * 2 * np.pi / L))
+a_max_est = g / (np.exp(- b * 2 * np.pi / L) - 1)
 
 # or (reverse)
 # b_est = - (L / (2 * np.pi)) * np.log(1 - g / a_min)
-# b_est = - (L / (2 * np.pi)) * np.log(1 + g / a_max)
+# b_est = - (L / (2 * np.pi)) * np.log(g / a_max - 1)
 
 # Also
 # L = g * T * T / (2 * np.pi) if depth is infinite
@@ -98,7 +98,7 @@ print(f'low_pass_filtered_min_a (m/s^2): {low_pass_filtered_min_a:,.4f}')
 print(f'low_pass_filtered_max_a (m/s^2): {low_pass_filtered_max_a:,.4f}')
 
 b_from_min_a = - (L_source1 / (2 * np.pi)) * np.log(1 - g / low_pass_filtered_min_a)
-b_from_max_a = - (L_source1 / (2 * np.pi)) * np.log(1 + g / low_pass_filtered_max_a)
+b_from_max_a = - (L_source1 / (2 * np.pi)) * np.log(g / low_pass_filtered_max_a - 1)
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source1) * L_source1 / 2 / np.pi
 print(f'H_from_min_a upwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
@@ -108,7 +108,7 @@ H_avg = (H_from_min_a + H_from_max_a) / 2
 print(f'H_avg downwind (m): {H_avg:,.4f}')
 
 b_from_min_a = - (L_source2 / (2 * np.pi)) * np.log(1 - g / low_pass_filtered_min_a)
-b_from_max_a = - (L_source2 / (2 * np.pi)) * np.log(1 + g / low_pass_filtered_max_a)
+b_from_max_a = - (L_source2 / (2 * np.pi)) * np.log(g / low_pass_filtered_max_a - 1)
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source2) * L_source2 / 2 / np.pi
 print(f'H_from_min_a downwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
