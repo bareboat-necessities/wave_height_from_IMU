@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 g = 9.81  # Gravitational G (m/s^2)
 
-b = -0.4  # Rotation center in Y axis (m)
+b = -1  # Rotation center in Y axis (m)
 L = 15  # Wave length (m)
 d = 30  # Depth (m)
 
