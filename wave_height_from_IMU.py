@@ -96,6 +96,7 @@ for t in range(n_timesteps):
             )
         )
 
+print(filtered_state_covariances[n_timesteps - 1])
 
 f, axarr = plt.subplots(3, sharex=True)
 

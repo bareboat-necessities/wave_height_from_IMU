@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 g = 9.81  # Gravitational G (m/s^2)
 
-b = -1  # Rotation center in Y axis (m)
+b = -2  # Rotation center in Y axis (m)
 L = 15  # Wave length (m)
 d = 3000000  # Depth (m)
 
@@ -117,7 +117,7 @@ print(f'H_from_min_a upwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a
 H_from_max_a = np.exp(2 * np.pi * b_from_max_a / L_source1) * L_source1 / 2 / np.pi
 print(f'H_from_max_a upwind (m): {H_from_max_a:,.4f}  b_from_max_a={b_from_max_a:,.4f}')
 H_avg = (H_from_min_a + H_from_max_a) / 2
-print(f'H_avg downwind (m): {H_avg:,.4f}')
+print(f'H_avg upwind (m): {H_avg:,.4f}')
 
 b_from_min_a = - (L_source2 / (2 * np.pi)) * np.log(1 - g / low_pass_filtered_min_a)
 b_from_max_a = - (L_source2 / (2 * np.pi)) * np.log(g / low_pass_filtered_max_a - 1)
