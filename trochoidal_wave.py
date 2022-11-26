@@ -12,10 +12,10 @@ g = 9.81  # Gravitational G (m/s^2)
 
 b = -1  # Rotation center in Y axis (m)
 L = 15  # Wave length (m)
-d = 30  # Depth (m)
+d = 3000000  # Depth (m)
 
 k = 2 * np.pi / L  # Wave number (1/m)
-c = np.sqrt(g / k * np.tanh(d * k))  # Speed in X direction  m/s
+c = np.sqrt(g / k)  # Speed in X direction  m/s
 H = np.exp(k * b) / k  # Wave height (m)
 T = L / c  # Wave period (s)
 
@@ -41,17 +41,27 @@ print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}, B: {b}')
 dt = 0.01
 n_timesteps = int(8 * T / dt)
 
-x_val = np.zeros(n_timesteps)
+t_val = np.zeros(n_timesteps)
 y_val = np.zeros(n_timesteps)
 velY_val = np.zeros(n_timesteps)
 accY_val = np.zeros(n_timesteps)
 
+x = np.zeros(n_timesteps)
+z = np.zeros(n_timesteps)
+
 for ii in range(n_timesteps):
     t = ii * dt
-    x_val[ii] = t
-    y_val[ii] = - np.log (H * k * np.cos(c * k * t) + 1) / k
-    velY_val[ii] = c * H * k * np.sin(k * c * t) / (H * k * np.cos(k * c * t) + 1)
-    accY_val[ii] = (c**2) * H * (k ** 2) * np.cos(k * c * t) / (H * k * np.cos(k * c * t) + 1)
+    t_val[ii] = t
+    x[ii] = (H * np.sin(c * k * t) + (H - b) * k * c * t) / ((H - b) * k * c)
+    z[ii] = - H * np.cos(c * k * t)
+    if ii > 0:
+        x_ = x[ii]
+        y_ = z[ii]
+        y_val[ii] = y_
+        velY_val[ii] = (y_ - z[ii - 1]) / (x[ii] - x[ii - 1])
+        accY_val[ii] = (velY_val[ii] - velY_val[ii - 1]) / (x[ii] - x[ii - 1])
+
+print(f'max_y_val min_y_val H (m): {max(y_val):,.4f} {min(y_val):,.4f} {(max(y_val) - min(y_val))/2:,.4f}')
 
 # Finding frequency
 
@@ -121,18 +131,16 @@ print(f'H_avg downwind (m): {H_avg:,.4f}')
 
 f, axarr = plt.subplots(4)
 
-axarr[0].plot(x_val, y_val, label="Reference Pos")
+axarr[0].plot(x, z, label="Reference Pos")
 axarr[0].grid()
 axarr[0].legend()
 
-axarr[1].plot(x_val, velY_val, label="Reference Vertical Velocity")
-axarr[1].plot(x_val, velY_val, label="Reference Vertical Velocity Extrap")
+axarr[1].plot(x, velY_val, label="Reference Vertical Velocity")
 axarr[1].grid()
 axarr[1].legend()
 
-axarr[2].plot(x_val, accY_val, label="Reference Vertical Accel")
-axarr[2].plot(x_val, accY_val, label="Reference Vertical Accel Extrap")
-axarr[2].plot(x_val, low_pass_filtered, label="Low Pass Filtered Vertical Accel")
+axarr[2].plot(x, accY_val, label="Reference Vertical Accel")
+axarr[2].plot(t_val, low_pass_filtered, label="Low Pass Filtered Vertical Accel")
 axarr[2].grid()
 axarr[2].legend()
 
@@ -144,7 +152,7 @@ axarr[3].legend()
 file = open("trochoidal_wave.txt", "w+")
 for ii in range(n_timesteps):
     if ii > 0:
-        file.write(f'{x_val[ii]:,.4f}, {accY_val[ii]:,.8f}, {y_val[ii]:,.8f}, {velY_val[ii]:,.8f}\n')
+        file.write(f'{t_val[ii]:,.4f}, {accY_val[ii]:,.8f}, {y_val[ii]:,.8f}, {velY_val[ii]:,.8f}\n')
 file.close()
 
 plt.show()

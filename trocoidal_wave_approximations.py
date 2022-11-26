@@ -21,11 +21,14 @@ H_est1_arr = np.zeros(n1_iter * n2_iter)
 H_est2_arr = np.zeros(n1_iter * n2_iter)
 H_avg_arr = np.zeros(n1_iter * n2_iter)
 
+b1_err = np.zeros(n1_iter * n2_iter)
+b2_err = np.zeros(n1_iter * n2_iter)
+
 iii = 0
 for n1 in range(n1_iter):
     for n2 in range(n2_iter):
         L = dL * (n1 + 1)  # Wave length (m)
-        b = -db * L * (n2 + 10)  # Rotation center in Y axis (m)
+        b = -db * L * (n2 + 6)  # Rotation center in Y axis (m)
         d = 8000  # Depth (m)
 
         k = 2 * np.pi / L  # Wave number (1/m)
@@ -62,6 +65,8 @@ for n1 in range(n1_iter):
 
         b_est1 = - (L / (2 * np.pi)) * np.log(1 - g / min_a)
         b_est2 = - (L / (2 * np.pi)) * np.log(g / max_a - 1)
+        b1_err = (b-b_est1) / b
+        b2_err = (b-b_est2) / b
         H_est1 = np.exp(k * b_est1) / k
         H_est2 = np.exp(k * b_est2) / k
         H_est1_arr[iii] = H_est1
@@ -74,13 +79,19 @@ for n1 in range(n1_iter):
 
 fig = plt.figure(figsize=plt.figaspect(0.5))
 
-ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+ax1 = fig.add_subplot(2, 2, 1, projection='3d')
 ax1.scatter3D(min_a_arr, L_arr, H_arr, color='blue')
 ax1.scatter3D(min_a_arr, L_arr, H_avg_arr, color='red')
 ax1.set_title('Height/Height Estimated')
 
-ax2 = fig.add_subplot(1, 2, 2, projection='3d')
+ax2 = fig.add_subplot(2, 2, 2, projection='3d')
 ax2.scatter3D(max_a_arr, L_arr, H_arr, color='blue')
 ax2.scatter3D(max_a_arr, L_arr, H_avg_arr, color='red')
+
+ax3 = fig.add_subplot(2, 2, 3, projection='3d')
+ax3.scatter3D(max_a_arr, L_arr, b1_err, color='blue')
+
+ax4 = fig.add_subplot(2, 2, 4, projection='3d')
+ax4.scatter3D(min_a_arr, L_arr, b2_err, color='blue')
 
 plt.show()
