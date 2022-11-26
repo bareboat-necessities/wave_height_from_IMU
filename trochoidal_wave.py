@@ -57,11 +57,14 @@ for ii in range(n_timesteps):
     if ii > 0:
         x_ = x[ii]
         y_ = z[ii]
-        y_val[ii] = y_
-        velY_val[ii] = (y_ - z[ii - 1]) / (x[ii] - x[ii - 1])
-        accY_val[ii] = (velY_val[ii] - velY_val[ii - 1]) / (t_val[ii] - t_val[ii - 1])
+        y_val[ii] = z[ii]
+        velY_val[ii] = c* H * k * np.sin(c * k * t)
+        accY_val[ii] = c**2 * H * k**2 * np.cos(c * k * t)
 
 print(f'max_y_val min_y_val H (m): {max(y_val):,.4f} {min(y_val):,.4f} {(max(y_val) - min(y_val))/2:,.4f}')
+
+a_max_calc = g * np.exp(2 * np.pi * b / L)
+print(f'a_max_calc: {a_max_calc:,.4f}')
 
 # Finding frequency
 
@@ -109,8 +112,8 @@ low_pass_filtered_max_a = max(low_pass_filtered)
 print(f'low_pass_filtered_min_a (m/s^2): {low_pass_filtered_min_a:,.4f}')
 print(f'low_pass_filtered_max_a (m/s^2): {low_pass_filtered_max_a:,.4f}')
 
-b_from_min_a = - (L_source1 / (2 * np.pi)) * np.log(1 - g / low_pass_filtered_min_a)
-b_from_max_a = - (L_source1 / (2 * np.pi)) * np.log(g / low_pass_filtered_max_a - 1)
+b_from_min_a = (L_source1 / (2 * np.pi)) * np.log(-low_pass_filtered_min_a / g)
+b_from_max_a = (L_source1 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / g)
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source1) * L_source1 / 2 / np.pi
 print(f'H_from_min_a upwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
@@ -119,8 +122,8 @@ print(f'H_from_max_a upwind (m): {H_from_max_a:,.4f}  b_from_max_a={b_from_max_a
 H_avg = (H_from_min_a + H_from_max_a) / 2
 print(f'H_avg upwind (m): {H_avg:,.4f}')
 
-b_from_min_a = - (L_source2 / (2 * np.pi)) * np.log(1 - g / low_pass_filtered_min_a)
-b_from_max_a = - (L_source2 / (2 * np.pi)) * np.log(g / low_pass_filtered_max_a - 1)
+b_from_min_a = (L_source2 / (2 * np.pi)) * np.log(-low_pass_filtered_min_a / g)
+b_from_max_a = (L_source2 / (2 * np.pi)) * np.log(low_pass_filtered_max_a / g)
 
 H_from_min_a = np.exp(2 * np.pi * b_from_min_a / L_source2) * L_source2 / 2 / np.pi
 print(f'H_from_min_a downwind (m): {H_from_min_a:,.4f}  b_from_min_a={b_from_min_a:,.4f}')
@@ -131,15 +134,15 @@ print(f'H_avg downwind (m): {H_avg:,.4f}')
 
 f, axarr = plt.subplots(4)
 
-axarr[0].plot(x, z, label="Reference Pos")
+axarr[0].plot(t_val, z, label="Reference Pos")
 axarr[0].grid()
 axarr[0].legend()
 
-axarr[1].plot(x, velY_val, label="Reference Vertical Velocity")
+axarr[1].plot(t_val, velY_val, label="Reference Vertical Velocity")
 axarr[1].grid()
 axarr[1].legend()
 
-axarr[2].plot(x, accY_val, label="Reference Vertical Accel")
+axarr[2].plot(t_val, accY_val, label="Reference Vertical Accel")
 axarr[2].plot(t_val, low_pass_filtered, label="Low Pass Filtered Vertical Accel")
 axarr[2].grid()
 axarr[2].legend()
