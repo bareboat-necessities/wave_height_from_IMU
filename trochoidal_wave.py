@@ -59,7 +59,7 @@ for ii in range(n_timesteps):
         y_ = z[ii]
         y_val[ii] = y_
         velY_val[ii] = (y_ - z[ii - 1]) / (x[ii] - x[ii - 1])
-        accY_val[ii] = (velY_val[ii] - velY_val[ii - 1]) / (x[ii] - x[ii - 1])
+        accY_val[ii] = (velY_val[ii] - velY_val[ii - 1]) / (t_val[ii] - t_val[ii - 1])
 
 print(f'max_y_val min_y_val H (m): {max(y_val):,.4f} {min(y_val):,.4f} {(max(y_val) - min(y_val))/2:,.4f}')
 
