@@ -52,7 +52,7 @@ z = np.zeros(n_timesteps)
 for ii in range(n_timesteps):
     t = ii * dt
     t_val[ii] = t
-    x[ii] = (H * np.sin(c * k * t) + (H - b) * k * c * t) / ((H - b) * k * c)
+    x[ii] = (H * np.sin(c * k * t) + c * t) / c
     z[ii] = - H * np.cos(c * k * t)
     if ii > 0:
         x_ = x[ii]
