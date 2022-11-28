@@ -1,9 +1,16 @@
 # wave_height_from_IMU
 Calculate sea wave height from IMU
 
-Algorithm description
+Algorithm description:
+
+https://bareboat-necessities.github.io/my-bareboat/bareboat-math.html
+
+Kalman filter based on
 
 https://www.researchgate.net/profile/Mehdi-Hendijanizadeh/publication/264713649_A_Novel_Kalman_Filter_Based_Technique_for_Calculating_the_Time_History_of_Vertical_Displacement_of_a_Boat_from_Measured_Acceleration/links/53ec88db0cf24f241f1584c5/A-Novel-Kalman-Filter-Based-Technique-for-Calculating-the-Time-History-of-Vertical-Displacement-of-a-Boat-from-Measured-Acceleration.pdf
+
+And another model is based on vertical acceleration of trochoidal waves
+
 
 TODO: 
 - generate NMEA 0183 sentence for wave height
