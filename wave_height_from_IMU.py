@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # and set PosIntegral_Trans_Variance to higher value you will see it converges much better.
 
 
-Data = np.loadtxt(fname="test-data.txt", delimiter=",", skiprows=0)
+Data = np.loadtxt(fname="trochoidal_wave.txt", delimiter=",", skiprows=0)
 
 # Data description
 #  Time
