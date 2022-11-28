@@ -39,7 +39,7 @@ a_max_est = g / (1 + np.exp(- b * 2 * np.pi / L))
 print(f'Length: {L}, Height: {H}, Period: {T}, Speed: {c}, B: {b}')
 
 dt = 0.01
-n_timesteps = int(8 * T / dt)
+n_timesteps = int(16 * T / dt)
 
 t_val = np.zeros(n_timesteps)
 y_val = np.zeros(n_timesteps)
