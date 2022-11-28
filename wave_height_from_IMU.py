@@ -26,8 +26,8 @@ RefVelX = Data[:, [3]]
 
 AccX_Value = AccX
 AccX_Variance = 0.0007
-PosIntegral_Variance = 10        # TODO: ???
-PosIntegral_Trans_Variance = 10  # TODO: ???
+PosIntegral_Variance = 100        # TODO: ???
+PosIntegral_Trans_Variance = 100  # TODO: ???
 
 # time step
 dt = Data[1,0] - Data[0,0]
