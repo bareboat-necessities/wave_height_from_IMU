@@ -1,5 +1,9 @@
 # wave_height_from_IMU
-Calculate sea wave height from IMU
+
+(DEPRECATED REPOSITORY)
+Note: For actual implementation see: https://github.com/bareboat-necessities/bbn-wave-period-esp32
+
+Calculate sea wave height from IMU 
 
 Algorithm description:
 
